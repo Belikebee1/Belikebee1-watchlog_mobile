@@ -61,8 +61,8 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
       home: !_bootstrapped
           ? const _Splash()
           : auth.isAuthenticated
-              ? const StatusScreen()
-              : const LoginScreen(),
+          ? const StatusScreen()
+          : const LoginScreen(),
     );
   }
 }
