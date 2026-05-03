@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/client.dart';
 import '../providers/auth_provider.dart';
+import '../providers/push_provider.dart';
 import '../theme.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -48,6 +49,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return;
       }
       await ref.read(authProvider.notifier).signIn(url, token);
+      // After sign-in, register FCM token with backend
+      try {
+        await ref.read(pushServiceProvider).onSignIn();
+      } catch (_) {}
     } on DioException catch (e) {
       setState(() {
         _error = 'Network error: ${e.message ?? e.type.name}';

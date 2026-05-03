@@ -1,12 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers/auth_provider.dart';
+import 'providers/push_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/status_screen.dart';
 import 'theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Try to init Firebase. If it fails (e.g. no google-services.json yet during
+  // first run), the app still works — push just doesn't.
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase init failed (push disabled): $e');
+  }
   runApp(const ProviderScope(child: WatchlogApp()));
 }
 
@@ -28,6 +38,12 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
 
   Future<void> _bootstrap() async {
     await ref.read(authProvider.notifier).load();
+    // Init push (may fail silently if Firebase not configured — that's OK)
+    try {
+      await ref.read(pushServiceProvider).initialize();
+    } catch (e) {
+      debugPrint('Push init failed: $e');
+    }
     if (mounted) setState(() => _bootstrapped = true);
   }
 

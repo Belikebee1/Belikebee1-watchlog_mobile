@@ -85,6 +85,29 @@ class WatchlogApi {
     return ActionResult.fromJson(resp.data!);
   }
 
+  Future<void> registerPushToken({
+    required String token,
+    required String platform,
+    String? deviceLabel,
+  }) async {
+    final resp = await _dio.post<dynamic>(
+      '/api/v1/push/register',
+      data: {
+        'token': token,
+        'platform': platform,
+        if (deviceLabel != null) 'device_label': deviceLabel,
+      },
+    );
+    _ensureOk(resp);
+  }
+
+  Future<void> unregisterPushToken(String token) async {
+    final resp = await _dio.delete<dynamic>(
+      '/api/v1/push/register/${Uri.encodeComponent(token)}',
+    );
+    _ensureOk(resp);
+  }
+
   void _ensureOk(Response resp) {
     if (resp.statusCode == null || resp.statusCode! >= 400) {
       throw DioException(
