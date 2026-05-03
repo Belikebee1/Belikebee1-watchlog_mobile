@@ -49,6 +49,10 @@ coverage/
 serviceAccountKey.json
 firebase-service-account.json
 
-# Note: google-services.json, GoogleService-Info.plist, firebase_options.dart
-# CAN be committed safely (they hold only public app identifiers restricted
-# to specific bundle IDs). They are required for clones to build the app.
+# Firebase config files - regenerate via 'flutterfire configure'
+# (their API keys are technically public-by-design, but GitHub Secret Scanning
+# flags them anyway. Each developer regenerates on first clone.)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+ios/firebase_app_id_file.json
+lib/firebase_options.dart
