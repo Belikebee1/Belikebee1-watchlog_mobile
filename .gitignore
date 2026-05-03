@@ -43,3 +43,12 @@ coverage/
 # Local secrets
 .env
 .env.local
+
+# Firebase Admin SDK private key — NEVER commit, used only server-side
+*firebase-adminsdk*.json
+serviceAccountKey.json
+firebase-service-account.json
+
+# Note: google-services.json, GoogleService-Info.plist, firebase_options.dart
+# CAN be committed safely (they hold only public app identifiers restricted
+# to specific bundle IDs). They are required for clones to build the app.
