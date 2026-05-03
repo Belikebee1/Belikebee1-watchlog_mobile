@@ -1,0 +1,36 @@
+name: watchlog
+description: Mobile companion app for watchlog – tap-to-fix server alerts on your phone.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_riverpod: ^2.6.1
+
+  # HTTP
+  dio: ^5.7.0
+
+  # Secure storage for API token
+  flutter_secure_storage: ^9.2.2
+
+  # Pull-to-refresh
+  flutter_hooks: ^0.20.5
+
+  # Date formatting
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
