@@ -22,6 +22,7 @@ class CheckRow extends StatelessWidget {
   final VoidCallback onSnooze;
   final VoidCallback onIgnore;
   final VoidCallback onClear;
+  final VoidCallback? onTap;
 
   const CheckRow({
     super.key,
@@ -29,6 +30,7 @@ class CheckRow extends StatelessWidget {
     required this.onSnooze,
     required this.onIgnore,
     required this.onClear,
+    this.onTap,
   });
 
   @override
@@ -45,7 +47,9 @@ class CheckRow extends StatelessWidget {
 
     return Opacity(
       opacity: data.silenced == SilencedKind.none ? 1 : 0.6,
-      child: Padding(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
         padding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -94,6 +98,7 @@ class CheckRow extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

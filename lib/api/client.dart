@@ -157,6 +157,15 @@ class WatchlogApi {
     return ActionResult.fromJson(resp.data!);
   }
 
+  /// Fetch human-readable explainers for every check + the severity legend.
+  /// Static metadata, bilingual (en/pl). Safe to cache aggressively —
+  /// updates ride along with the watchlog backend version.
+  Future<Map<String, dynamic>> fetchChecksInfo() async {
+    final resp = await _dio.get<Map<String, dynamic>>('/api/v1/checks/info');
+    _ensureOk(resp);
+    return resp.data!;
+  }
+
   Future<void> registerPushToken({
     required String token,
     required String platform,

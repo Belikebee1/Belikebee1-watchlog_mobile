@@ -7,8 +7,10 @@ import '../api/models.dart';
 import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
+import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
 import '../widgets/severity_banner.dart';
+import '../widgets/severity_legend_sheet.dart';
 import 'add_server_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
@@ -319,6 +321,13 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                     onSnooze: () => _onSnooze(rows[i].check),
                     onIgnore: () => _onIgnore(rows[i].check),
                     onClear: () => _onClear(rows[i].check),
+                    onTap: () => CheckExplainerSheet.show(
+                      context,
+                      data: rows[i],
+                      onSnooze: () => _onSnooze(rows[i].check),
+                      onIgnore: () => _onIgnore(rows[i].check),
+                      onClear: () => _onClear(rows[i].check),
+                    ),
                   ),
                 ],
               ],
@@ -330,15 +339,19 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
 
   Widget _countsRow(Status s) {
     final c = s.counts;
-    return Row(
-      children: [
-        Expanded(child: _countChip('OK', c['OK'] ?? 0, AppColors.green)),
-        Expanded(child: _countChip('INFO', c['INFO'] ?? 0, AppColors.accent)),
-        Expanded(child: _countChip('WARN', c['WARN'] ?? 0, AppColors.yellow)),
-        Expanded(
-            child:
-                _countChip('CRITICAL', c['CRITICAL'] ?? 0, AppColors.red)),
-      ],
+    return InkWell(
+      onTap: () => SeverityLegendSheet.show(context),
+      borderRadius: BorderRadius.circular(8),
+      child: Row(
+        children: [
+          Expanded(child: _countChip('OK', c['OK'] ?? 0, AppColors.green)),
+          Expanded(child: _countChip('INFO', c['INFO'] ?? 0, AppColors.accent)),
+          Expanded(child: _countChip('WARN', c['WARN'] ?? 0, AppColors.yellow)),
+          Expanded(
+              child:
+                  _countChip('CRITICAL', c['CRITICAL'] ?? 0, AppColors.red)),
+        ],
+      ),
     );
   }
 
