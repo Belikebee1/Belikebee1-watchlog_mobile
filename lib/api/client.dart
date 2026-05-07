@@ -2,6 +2,78 @@ import 'package:dio/dio.dart';
 
 import 'models.dart';
 
+/// The plaintext API token + display name returned by a successful pairing
+/// exchange. The token is shown only once by the server and must be stored
+/// immediately in secure storage.
+class PairResult {
+  final String token;
+  final String name;
+  final String deviceId;
+  final List<String> scopes;
+  const PairResult({
+    required this.token,
+    required this.name,
+    required this.deviceId,
+    required this.scopes,
+  });
+}
+
+/// Exchange a pairing code for a per-device API token.
+///
+/// This is a STATIC helper because it runs without authentication —
+/// there's no token yet. It hits POST /api/v1/pair on the server URL
+/// embedded in the QR (or typed by the user). On success the returned
+/// [PairResult] contains the plaintext token; on 401 returns null;
+/// any other failure throws.
+Future<PairResult?> pairWithCode({
+  required String baseUrl,
+  required String code,
+  required String? deviceLabel,
+  required String platform,
+}) async {
+  final cleanedUrl =
+      baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+  final dio = Dio(BaseOptions(
+    baseUrl: cleanedUrl,
+    connectTimeout: const Duration(seconds: 15),
+    receiveTimeout: const Duration(seconds: 30),
+    headers: {'Accept': 'application/json'},
+    validateStatus: (s) => s != null && s < 500,
+  ));
+  final resp = await dio.post<Map<String, dynamic>>(
+    '/api/v1/pair',
+    data: {
+      'code': code.trim().toUpperCase(),
+      if (deviceLabel != null && deviceLabel.isNotEmpty) 'device_label': deviceLabel,
+      'platform': platform,
+    },
+  );
+  if (resp.statusCode == 401) return null;
+  if (resp.statusCode == 429) {
+    throw DioException(
+      requestOptions: resp.requestOptions,
+      response: resp,
+      message: 'Too many attempts — wait a minute before retrying.',
+    );
+  }
+  if (resp.statusCode != 200 || resp.data == null) {
+    throw DioException(
+      requestOptions: resp.requestOptions,
+      response: resp,
+      message: 'Unexpected response: HTTP ${resp.statusCode}',
+    );
+  }
+  final data = resp.data!;
+  return PairResult(
+    token: data['token'] as String,
+    name: (data['name'] as String?) ?? '',
+    deviceId: (data['device_id'] as String?) ?? '',
+    scopes: ((data['scopes'] as List<dynamic>?) ?? [])
+        .map((e) => e.toString())
+        .toList(),
+  );
+}
+
 /// Thin wrapper over Dio with auth + base URL injection.
 class WatchlogApi {
   final Dio _dio;
