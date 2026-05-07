@@ -1,51 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/push_provider.dart';
 import '../theme.dart';
+import 'add_server_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider);
+    final servers = ref.watch(serversProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
           const SizedBox(height: 8),
+          const _SectionHeader('Servers'),
+          for (final s in servers.servers)
+            _ServerTile(
+              server: s,
+              isActive: s.id == servers.active?.id,
+              onSetActive: () =>
+                  ref.read(serversProvider.notifier).setActive(s.id),
+              onRename: (newName) =>
+                  ref.read(serversProvider.notifier).renameServer(s.id, newName),
+              onRemove: () async {
+                try {
+                  await ref.read(pushServiceProvider).onServerRemoved(s);
+                } catch (_) {}
+                await ref.read(serversProvider.notifier).removeServer(s.id);
+              },
+            ),
           ListTile(
-            leading: const Icon(Icons.cloud_outlined, color: AppColors.fgMuted),
-            title: const Text('API URL'),
-            subtitle: Text(auth.baseUrl ?? '(not set)',
-                style: const TextStyle(color: AppColors.fgMuted)),
-          ),
-          ListTile(
-            leading: const Icon(Icons.key_outlined, color: AppColors.fgMuted),
-            title: const Text('Token'),
-            subtitle: Text(
-              auth.token == null
-                  ? '(not set)'
-                  : '${auth.token!.substring(0, 8)}…${auth.token!.substring(auth.token!.length - 4)}',
-              style: const TextStyle(
-                  color: AppColors.fgMuted, fontFamily: 'monospace'),
+            leading: const Icon(Icons.add, color: AppColors.accent),
+            title: const Text('Add server…',
+                style: TextStyle(color: AppColors.accent)),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddServerScreen()),
             ),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: AppColors.red),
-            title: const Text('Sign out',
+            title: const Text('Sign out of all servers',
                 style: TextStyle(color: AppColors.red)),
+            enabled: servers.servers.isNotEmpty,
             onTap: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   backgroundColor: AppColors.bgElevated,
-                  title: const Text('Sign out?'),
+                  title: const Text('Sign out of all servers?'),
                   content: const Text(
-                      'You will need to enter the token again to sign in.'),
+                      'This removes every server from this device. You will need to add them again to receive alerts.'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
@@ -61,9 +72,9 @@ class SettingsScreen extends ConsumerWidget {
               );
               if (confirm == true) {
                 try {
-                  await ref.read(pushServiceProvider).onSignOut();
+                  await ref.read(pushServiceProvider).onSignOutAll();
                 } catch (_) {}
-                await ref.read(authProvider.notifier).signOut();
+                await ref.read(serversProvider.notifier).signOutAll();
                 if (context.mounted) Navigator.pop(context);
               }
             },
@@ -76,6 +87,124 @@ class SettingsScreen extends ConsumerWidget {
               'watchlog mobile · v0.1.0\nhttps://watchlog.pl',
               style: TextStyle(color: AppColors.fgMuted),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String label;
+  const _SectionHeader(this.label);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        child: Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            color: AppColors.fgMuted,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      );
+}
+
+class _ServerTile extends StatelessWidget {
+  final Server server;
+  final bool isActive;
+  final VoidCallback onSetActive;
+  final ValueChanged<String> onRename;
+  final VoidCallback onRemove;
+
+  const _ServerTile({
+    required this.server,
+    required this.isActive,
+    required this.onSetActive,
+    required this.onRename,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        isActive ? Icons.radio_button_checked : Icons.radio_button_off,
+        color: isActive ? AppColors.accent : AppColors.fgMuted,
+      ),
+      title: Text(server.name),
+      subtitle: Text(
+        server.baseUrl,
+        style: const TextStyle(color: AppColors.fgMuted, fontSize: 12),
+      ),
+      onTap: isActive ? null : onSetActive,
+      trailing: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert, color: AppColors.fgMuted),
+        onSelected: (value) async {
+          if (value == 'rename') {
+            final newName = await _promptRename(context, server.name);
+            if (newName != null && newName.trim().isNotEmpty) {
+              onRename(newName);
+            }
+          } else if (value == 'remove') {
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: AppColors.bgElevated,
+                title: Text('Remove ${server.name}?'),
+                content: const Text(
+                    'This stops alerts from this server on this device.'),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancel')),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Remove',
+                        style: TextStyle(color: AppColors.red)),
+                  ),
+                ],
+              ),
+            );
+            if (confirm == true) onRemove();
+          }
+        },
+        itemBuilder: (ctx) => const [
+          PopupMenuItem<String>(
+            value: 'rename',
+            child: Text('Rename'),
+          ),
+          PopupMenuItem<String>(
+            value: 'remove',
+            child: Text('Remove', style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<String?> _promptRename(BuildContext context, String current) async {
+    final controller = TextEditingController(text: current);
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bgElevated,
+        title: const Text('Rename server'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Display name'),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, controller.text),
+            child: const Text('Save'),
           ),
         ],
       ),

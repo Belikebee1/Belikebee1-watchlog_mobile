@@ -5,14 +5,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../api/client.dart';
+import '../models/server.dart';
 import 'auth_provider.dart';
 
-/// Manages FCM token lifecycle:
+/// Manages the FCM token lifecycle across all configured servers:
 ///   - request notification permission (iOS prompt)
 ///   - fetch token
-///   - register it with the backend after sign in
+///   - register the same token on every configured server
 ///   - re-register on token refresh
-///   - display foreground notifications via flutter_local_notifications
+///   - register against a newly added server
+///   - unregister against a removed server
+///   - render foreground notifications via flutter_local_notifications
 class PushService {
   final FlutterLocalNotificationsPlugin _local =
       FlutterLocalNotificationsPlugin();
@@ -31,8 +35,6 @@ class PushService {
       sound: true,
     );
 
-    // Local notifications setup (we render foreground messages ourselves;
-    // background ones are rendered by the OS automatically).
     const androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings(
@@ -45,7 +47,6 @@ class PushService {
       iOS: iosInit,
     ));
 
-    // Android channel matching what the backend names in AndroidConfig
     const channel = AndroidNotificationChannel(
       'watchlog_alerts',
       'watchlog alerts',
@@ -57,42 +58,52 @@ class PushService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    // Foreground messages: render via local notifications
     FirebaseMessaging.onMessage.listen(_onForegroundMessage);
-
-    // Token refresh: re-register with backend
     messaging.onTokenRefresh.listen(_onTokenRefresh);
 
-    // Get initial token + register
     final token = await messaging.getToken();
     if (token != null) {
-      await _registerToken(token);
+      _currentToken = token;
+      await _registerOnAllServers(token);
     }
   }
 
   Future<void> _onTokenRefresh(String token) async {
     debugPrint('FCM token refreshed: ${token.substring(0, 16)}...');
-    await _registerToken(token);
+    _currentToken = token;
+    await _registerOnAllServers(token);
   }
 
-  Future<void> _registerToken(String token) async {
-    if (token == _currentToken) return;
-    final api = _ref.read(apiProvider);
-    if (api == null) {
-      debugPrint('FCM: not signed in yet, skipping register');
-      _currentToken = token;
+  Future<void> _registerOnAllServers(String token) async {
+    final servers = _ref.read(serversProvider).servers;
+    if (servers.isEmpty) {
+      debugPrint('FCM: no servers configured, skipping register');
       return;
     }
+    for (final s in servers) {
+      await _registerOnServer(s, token);
+    }
+  }
+
+  Future<void> _registerOnServer(Server s, String token) async {
     try {
+      final api = WatchlogApi(baseUrl: s.baseUrl, token: s.token);
       await api.registerPushToken(
         token: token,
         platform: Platform.isAndroid ? 'android' : 'ios',
+        deviceLabel: null,
       );
-      _currentToken = token;
-      debugPrint('FCM token registered with backend');
+      debugPrint('FCM token registered on ${s.name}');
     } catch (e) {
-      debugPrint('FCM register failed: $e');
+      debugPrint('FCM register failed on ${s.name}: $e');
     }
+  }
+
+  Future<void> _unregisterOnServer(Server s, String token) async {
+    try {
+      final api = WatchlogApi(baseUrl: s.baseUrl, token: s.token);
+      await api.unregisterPushToken(token);
+    } catch (_) {}
   }
 
   Future<void> _onForegroundMessage(RemoteMessage msg) async {
@@ -120,23 +131,31 @@ class PushService {
     );
   }
 
-  /// Called after the user signs in — re-register the token if we have it.
-  Future<void> onSignIn() async {
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) {
-      await _registerToken(token);
-    }
+  /// Called after a server is added — register the current FCM token on it.
+  Future<void> onServerAdded(Server s) async {
+    final token =
+        _currentToken ?? await FirebaseMessaging.instance.getToken();
+    if (token == null) return;
+    _currentToken = token;
+    await _registerOnServer(s, token);
   }
 
-  /// Called on sign-out — drop the token from the backend so they stop
-  /// receiving alerts.
-  Future<void> onSignOut() async {
-    if (_currentToken == null) return;
-    final api = _ref.read(apiProvider);
-    if (api == null) return;
-    try {
-      await api.unregisterPushToken(_currentToken!);
-    } catch (_) {}
+  /// Called before a server is removed — drop our FCM token from it so it
+  /// stops sending pushes to this device.
+  Future<void> onServerRemoved(Server s) async {
+    final token = _currentToken;
+    if (token == null) return;
+    await _unregisterOnServer(s, token);
+  }
+
+  /// Called on global sign-out (all servers removed) — unregister token from
+  /// every server we know about, then forget it locally.
+  Future<void> onSignOutAll() async {
+    final token = _currentToken;
+    if (token == null) return;
+    for (final s in _ref.read(serversProvider).servers) {
+      await _unregisterOnServer(s, token);
+    }
     _currentToken = null;
   }
 }

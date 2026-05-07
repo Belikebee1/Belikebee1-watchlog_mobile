@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/push_provider.dart';
-import 'screens/login_screen.dart';
+import 'screens/add_server_screen.dart';
 import 'screens/status_screen.dart';
 import 'theme.dart';
 
@@ -61,8 +61,8 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
       home: !_bootstrapped
           ? const _Splash()
           : auth.isAuthenticated
-          ? const StatusScreen()
-          : const LoginScreen(),
+              ? const StatusScreen()
+              : const AddServerScreen(isFirstRun: true),
     );
   }
 }

@@ -9,6 +9,7 @@ import '../providers/status_provider.dart';
 import '../theme.dart';
 import '../widgets/check_row.dart';
 import '../widgets/severity_banner.dart';
+import 'add_server_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
 
@@ -152,10 +153,27 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncCombined = ref.watch(statusProvider);
+    final servers = ref.watch(serversProvider);
+    final active = servers.active;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('👁️  watchlog'),
+        title: _ServerSwitcher(
+          servers: servers.servers.map((s) => (id: s.id, name: s.name)).toList(),
+          activeId: active?.id,
+          activeName: active?.name ?? 'watchlog',
+          onSelect: (id) async {
+            await ref.read(serversProvider.notifier).setActive(id);
+            ref.invalidate(statusProvider);
+          },
+          onAdd: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddServerScreen()),
+            );
+            ref.invalidate(statusProvider);
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -350,4 +368,88 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
           ),
         ),
       );
+}
+
+/// App-bar title that doubles as a server picker. Tap → menu listing every
+/// configured server plus "Add server…". A single-server install renders as
+/// a plain title (no menu).
+class _ServerSwitcher extends StatelessWidget {
+  final List<({String id, String name})> servers;
+  final String? activeId;
+  final String activeName;
+  final ValueChanged<String> onSelect;
+  final VoidCallback onAdd;
+
+  const _ServerSwitcher({
+    required this.servers,
+    required this.activeId,
+    required this.activeName,
+    required this.onSelect,
+    required this.onAdd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasMultiple = servers.length > 1;
+    return PopupMenuButton<String>(
+      tooltip: 'Switch server',
+      onSelected: (value) {
+        if (value == '__add__') {
+          onAdd();
+        } else {
+          onSelect(value);
+        }
+      },
+      itemBuilder: (ctx) => [
+        for (final s in servers)
+          PopupMenuItem<String>(
+            value: s.id,
+            child: Row(
+              children: [
+                Icon(
+                  s.id == activeId
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  size: 18,
+                  color: s.id == activeId
+                      ? AppColors.accent
+                      : AppColors.fgMuted,
+                ),
+                const SizedBox(width: 12),
+                Text(s.name),
+              ],
+            ),
+          ),
+        const PopupMenuDivider(),
+        const PopupMenuItem<String>(
+          value: '__add__',
+          child: Row(
+            children: [
+              Icon(Icons.add, size: 18, color: AppColors.fgMuted),
+              SizedBox(width: 12),
+              Text('Add server…'),
+            ],
+          ),
+        ),
+      ],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('👁️  ', style: TextStyle(fontSize: 18)),
+          Flexible(
+            child: Text(
+              activeName,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          if (hasMultiple)
+            const Icon(Icons.arrow_drop_down, color: AppColors.fgMuted),
+        ],
+      ),
+    );
+  }
 }
