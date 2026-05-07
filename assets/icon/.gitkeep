@@ -1,0 +1,2 @@
+Place icon.png (1024x1024 PNG, no transparency) here on Windows.
+Then run: dart run flutter_launcher_icons
