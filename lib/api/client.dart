@@ -157,6 +157,39 @@ class WatchlogApi {
     return ActionResult.fromJson(resp.data!);
   }
 
+  /// List action shortcuts the operator has enabled (restart/reboot/logs).
+  Future<List<dynamic>> listActions() async {
+    final resp = await _dio.get<Map<String, dynamic>>('/api/v1/actions');
+    _ensureOk(resp);
+    return (resp.data?['actions'] as List?) ?? [];
+  }
+
+  Future<ActionResult> restartService(String service) async {
+    final resp = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/actions/restart-service',
+      data: {'service': service},
+    );
+    _ensureOk(resp);
+    return ActionResult.fromJson(resp.data!);
+  }
+
+  Future<ActionResult> rebootHost() async {
+    final resp = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/actions/reboot',
+    );
+    _ensureOk(resp);
+    return ActionResult.fromJson(resp.data!);
+  }
+
+  Future<ActionResult> tailLogs(String service, {int lines = 100}) async {
+    final resp = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/actions/logs',
+      data: {'service': service, 'lines': lines},
+    );
+    _ensureOk(resp);
+    return ActionResult.fromJson(resp.data!);
+  }
+
   /// Fetch human-readable explainers for every check + the severity legend.
   /// Static metadata, bilingual (en/pl). Safe to cache aggressively —
   /// updates ride along with the watchlog backend version.

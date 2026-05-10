@@ -349,6 +349,66 @@ class S {
     'pl': 'Skopiuj wynik',
   };
 
+  // ----- Action shortcuts (Phase 2D) -----
+  static const sectionActions = {'en': 'Actions', 'pl': 'Akcje'};
+  static const restartPrefix = {
+    'en': 'Restart {service}',
+    'pl': 'Zrestartuj {service}',
+  };
+  static const logsPrefix = {
+    'en': 'Logs: {service}',
+    'pl': 'Logi: {service}',
+  };
+  static const rebootServer = {
+    'en': 'Reboot server',
+    'pl': 'Zrestartuj serwer',
+  };
+  static const restartConfirmTitle = {
+    'en': 'Restart {service}?',
+    'pl': 'Zrestartować {service}?',
+  };
+  static const restartConfirmBody = {
+    'en':
+        'systemctl restart {service} will run on the server. Active connections to this service may drop briefly.',
+    'pl':
+        'systemctl restart {service} uruchomi się na serwerze. Aktywne połączenia mogą się na chwilę przerwać.',
+  };
+  static const restartCta = {'en': 'Restart', 'pl': 'Restart'};
+  static const rebootConfirmTitle = {
+    'en': 'Reboot server?',
+    'pl': 'Zrestartować serwer?',
+  };
+  static const rebootConfirmBody = {
+    'en':
+        'The server reboots in 1 minute. ALL services go down. Run `shutdown -c` on the box within that minute to abort.',
+    'pl':
+        'Serwer zrestartuje się za 1 minutę. WSZYSTKIE usługi się wyłączą. Uruchom `shutdown -c` na serwerze w tym czasie, by anulować.',
+  };
+  static const rebootCta = {'en': 'Reboot', 'pl': 'Restart'};
+  static const restartingSnack = {
+    'en': 'Restarting {service}…',
+    'pl': 'Restartuję {service}…',
+  };
+  static const reboootingSnack = {
+    'en': 'Reboot scheduled in 1 minute',
+    'pl': 'Restart zaplanowany za 1 minutę',
+  };
+  static const noActionsConfigured = {
+    'en':
+        'No action shortcuts configured. Edit /etc/watchlog/config.yaml on the server and add services to actions.allowed_services.',
+    'pl':
+        'Brak skonfigurowanych akcji. Edytuj /etc/watchlog/config.yaml na serwerze i dodaj usługi do actions.allowed_services.',
+  };
+  static const logsTitle = {
+    'en': 'Logs: {service}',
+    'pl': 'Logi: {service}',
+  };
+  static const logsLines = {
+    'en': 'Last {n} lines',
+    'pl': 'Ostatnie {n} linii',
+  };
+  static const logsRefresh = {'en': 'Refresh', 'pl': 'Odśwież'};
+
   // ----- History browser (Phase 2C) -----
   static const historyTitle = {'en': 'History', 'pl': 'Historia'};
   static const historyTooltip = {

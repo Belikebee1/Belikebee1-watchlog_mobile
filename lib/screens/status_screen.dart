@@ -10,6 +10,7 @@ import '../providers/host_info_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
 import '../utils/error_humanizer.dart';
+import '../widgets/actions_panel.dart';
 import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
 import '../widgets/error_view.dart';
@@ -278,6 +279,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
           const SizedBox(height: 12),
         ],
         SeverityBanner(status: status, onRefresh: _refresh),
+        const SizedBox(height: 12),
+        ActionsPanel(serverId: widget.serverId),
         const SizedBox(height: 16),
         Row(
           children: [
