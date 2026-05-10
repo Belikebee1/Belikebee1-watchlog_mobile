@@ -8,6 +8,7 @@ import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
+import '../widgets/skeleton.dart';
 import 'add_server_screen.dart';
 import 'settings_screen.dart';
 import 'status_screen.dart';
@@ -190,31 +191,55 @@ class _CardLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
+    // Mirror _CardLoaded layout pixel-for-pixel — same severity dot
+    // position, same name slot, same chips strip — so the user doesn't
+    // see content jump when the skeleton resolves into real data.
+    return SkeletonGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(server.name,
-                  style: const TextStyle(
-                    color: AppColors.fg,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  )),
-              const SizedBox(height: 2),
-              const Text('Loading…',
-                  style: TextStyle(color: AppColors.fgMuted, fontSize: 12)),
+              const Skeleton.circle(
+                size: 12,
+                margin: EdgeInsets.only(top: 4),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      server.name,
+                      style: const TextStyle(
+                        color: AppColors.fg,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Skeleton(width: 120, height: 12, radius: 4),
+                  ],
+                ),
+              ),
+              const Skeleton(width: 48, height: 11, radius: 4),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          Row(
+            children: const [
+              Skeleton(width: 56, height: 24, radius: 6),
+              SizedBox(width: 6),
+              Skeleton(width: 56, height: 24, radius: 6),
+              SizedBox(width: 6),
+              Skeleton(width: 56, height: 24, radius: 6),
+              SizedBox(width: 6),
+              Skeleton(width: 56, height: 24, radius: 6),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

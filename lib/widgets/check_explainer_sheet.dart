@@ -5,6 +5,7 @@ import '../models/check_info.dart';
 import '../providers/check_info_provider.dart';
 import '../theme.dart';
 import '../widgets/check_row.dart';
+import '../widgets/skeleton.dart';
 
 /// Modal bottom sheet that explains a single check in plain language.
 ///
@@ -87,10 +88,7 @@ class CheckExplainerSheet extends ConsumerWidget {
               _Header(data: data, asyncInfo: asyncInfo, locale: locale),
               const SizedBox(height: 16),
               asyncInfo.when(
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+                loading: () => const _ExplainerSkeleton(),
                 error: (e, _) => _CurrentResultOnly(data: data),
                 data: (info) {
                   final explainer = info?.explainerFor(data.check);
@@ -402,3 +400,38 @@ const Map<String, String> _kRemediationLabels = {
   'en': 'How to fix',
   'pl': 'Co zrobić',
 };
+
+/// Loading state for the explainer sheet — three placeholder sections
+/// shaped like the eventual "What / Why / How to fix" blocks. The
+/// SkeletonGroup is owned by the surrounding sheet, so this just
+/// arranges static rectangles.
+class _ExplainerSkeleton extends StatelessWidget {
+  const _ExplainerSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonGroup(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < 3; i++) ...[
+            Row(
+              children: const [
+                Icon(Icons.circle, size: 12, color: AppColors.fgMuted),
+                SizedBox(width: 6),
+                Skeleton(width: 80, height: 11),
+              ],
+            ),
+            const SizedBox(height: 6),
+            const Skeleton(width: double.infinity, height: 12),
+            const SizedBox(height: 4),
+            const Skeleton(width: double.infinity, height: 12),
+            const SizedBox(height: 4),
+            const Skeleton(width: 220, height: 12),
+            const SizedBox(height: 16),
+          ],
+        ],
+      ),
+    );
+  }
+}

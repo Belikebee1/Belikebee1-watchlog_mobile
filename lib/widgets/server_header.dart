@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/host_info.dart';
 import '../providers/host_info_provider.dart';
 import '../theme.dart';
+import 'skeleton.dart';
 
 /// Compact metadata strip that sits above the severity banner on the
 /// per-server status screen. Shows the OS, kernel, uptime and primary
@@ -21,11 +22,44 @@ class ServerHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncInfo = ref.watch(hostInfoProvider(serverId));
-    return asyncInfo.maybeWhen(
-      data: (info) => info == null
-          ? const SizedBox.shrink()
-          : _CompactStrip(info: info),
-      orElse: () => const SizedBox.shrink(),
+    return asyncInfo.when(
+      loading: () => const _HeaderSkeleton(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (info) =>
+          info == null ? const SizedBox.shrink() : _CompactStrip(info: info),
+    );
+  }
+}
+
+/// Loading-state placeholder shaped like the real compact strip so the
+/// status screen doesn't jump when the host endpoint resolves.
+class _HeaderSkeleton extends StatelessWidget {
+  const _HeaderSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonGroup(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.bgElevated,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.dns_outlined, size: 18, color: AppColors.fgMuted),
+            SizedBox(width: 8),
+            Skeleton(width: 100, height: 12),
+            SizedBox(width: 12),
+            Skeleton(width: 80, height: 12),
+            SizedBox(width: 12),
+            Skeleton(width: 60, height: 12),
+            Spacer(),
+            Icon(Icons.chevron_right, size: 18, color: AppColors.fgMuted),
+          ],
+        ),
+      ),
     );
   }
 }

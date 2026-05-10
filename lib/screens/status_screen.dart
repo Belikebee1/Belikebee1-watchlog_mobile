@@ -13,6 +13,7 @@ import '../widgets/check_row.dart';
 import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
+import '../widgets/skeleton.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
 
@@ -187,7 +188,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       body: RefreshIndicator(
         onRefresh: () async => _refresh(),
         child: asyncCombined.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const _StatusSkeleton(),
           error: (e, _) => ListView(
             padding: const EdgeInsets.all(24),
             children: [
@@ -382,5 +383,114 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
           ),
         ),
       );
+}
+
+/// Loading-state stand-in for the status screen. Mirrors the layout of
+/// the real content (server header strip → severity banner → action
+/// buttons → counts strip → check rows) so the page doesn't reflow when
+/// data arrives.
+class _StatusSkeleton extends StatelessWidget {
+  const _StatusSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonGroup(
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Server header strip skeleton
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.bgElevated,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: const [
+                Icon(Icons.dns_outlined,
+                    size: 18, color: AppColors.fgMuted),
+                SizedBox(width: 8),
+                Skeleton(width: 100, height: 12),
+                SizedBox(width: 12),
+                Skeleton(width: 80, height: 12),
+                SizedBox(width: 12),
+                Skeleton(width: 60, height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Severity banner skeleton — mimics the real banner's height
+          Container(
+            height: 90,
+            decoration: BoxDecoration(
+              color: AppColors.bgElevated,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Skeleton(width: 80, height: 16),
+                SizedBox(height: 8),
+                Skeleton(width: 200, height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: const [
+              Expanded(child: Skeleton(height: 44, radius: 8)),
+              SizedBox(width: 8),
+              Expanded(child: Skeleton(height: 44, radius: 8)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: const [
+              Expanded(child: Skeleton(height: 50, radius: 8)),
+              SizedBox(width: 8),
+              Expanded(child: Skeleton(height: 50, radius: 8)),
+              SizedBox(width: 8),
+              Expanded(child: Skeleton(height: 50, radius: 8)),
+              SizedBox(width: 8),
+              Expanded(child: Skeleton(height: 50, radius: 8)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // A few check-row placeholders
+          for (var i = 0; i < 4; i++) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: AppColors.bgElevated,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Skeleton.circle(size: 18),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Skeleton(width: 100, height: 14),
+                        SizedBox(height: 6),
+                        Skeleton(width: double.infinity, height: 12),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
