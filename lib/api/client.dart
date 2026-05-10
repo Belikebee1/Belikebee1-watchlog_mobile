@@ -166,6 +166,16 @@ class WatchlogApi {
     return resp.data!;
   }
 
+  /// Fetch host metadata: hostname, OS, kernel, RAM/disk totals, uptime,
+  /// IPs. Static-ish — refreshed on every status screen entry rather
+  /// than polled, since these only change when the box reboots or you
+  /// resize the VM.
+  Future<Map<String, dynamic>> fetchHostInfo() async {
+    final resp = await _dio.get<Map<String, dynamic>>('/api/v1/host');
+    _ensureOk(resp);
+    return resp.data!;
+  }
+
   Future<void> registerPushToken({
     required String token,
     required String platform,

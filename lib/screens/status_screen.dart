@@ -7,8 +7,10 @@ import '../api/models.dart';
 import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
+import '../providers/host_info_provider.dart';
 import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
+import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
 import 'output_screen.dart';
@@ -43,6 +45,10 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
 
   void _refresh() {
     ref.invalidate(serverStatusProvider(widget.serverId));
+    // Host info is largely static, but pull-to-refresh is the user's
+    // explicit "refresh everything" gesture — re-fetch in case the box
+    // rebooted or its IPs changed.
+    ref.invalidate(hostInfoProvider(widget.serverId));
   }
 
   Future<void> _runWatchlog() async {
@@ -252,6 +258,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        ServerHeader(serverId: widget.serverId),
+        const SizedBox(height: 12),
         SeverityBanner(status: status, onRefresh: _refresh),
         const SizedBox(height: 16),
         Row(
