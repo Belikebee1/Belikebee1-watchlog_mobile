@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/strings.dart';
+
 /// Categorized, presentation-ready view of a thrown exception.
 ///
 /// We parse [DioException] (and a few common Dart core exceptions) into a
@@ -9,10 +11,8 @@ import 'package:flutter/material.dart';
 /// etc.). The original exception text is preserved as [rawDetails] so a
 /// "Show details" disclosure can show it for power users / bug reports.
 ///
-/// Why we don't just use `e.toString()`: Dio's default error messages are
-/// stack-traces-as-strings — hostile to end users. Our humanizer maps
-/// the typical failure modes (network, cert, 401, timeout) to phrasing
-/// that says what to *do*, not what went wrong internally.
+/// All strings come through the i18n catalogue, so the same exception
+/// renders in PL or EN depending on the user's locale.
 class HumanError {
   final String title;
   final String body;
@@ -30,42 +30,33 @@ class HumanError {
 }
 
 enum HumanErrorAction {
-  /// Token rejected — user should re-pair or remove the server. Surfaced
-  /// as a button labelled "Open settings".
+  /// Token rejected — user should re-pair or remove the server.
   rePair,
 
-  /// Token doesn't have the scope for this action. Operator must
-  /// regenerate with broader scopes.
+  /// Token doesn't have the scope for this action.
   rescope,
 
   /// Generic "try again later" — server overloaded, rate-limited, or
-  /// transient network. Surfaced as a "Retry" button (caller wires it).
+  /// transient network.
   retry,
 
-  /// Endpoint missing — backend likely on an older watchlog. Surfaced
-  /// as advisory text only; no action button (operator-only fix).
+  /// Endpoint missing — backend likely on an older watchlog.
   upgradeBackend,
 }
 
-/// Convert any [Object] into a [HumanError]. Recognizes [DioException]
-/// shapes and the standard Dart timeout / socket exceptions; everything
-/// else falls back to a generic "Unexpected error" with the raw text in
-/// details.
-HumanError humanize(Object error) {
+/// Convert any [Object] into a [HumanError], localized via [context].
+HumanError humanize(BuildContext context, Object error) {
   final raw = error.toString();
 
   if (error is DioException) {
-    return _humanizeDio(error, raw);
+    return _humanizeDio(context, error, raw);
   }
 
-  // Network exceptions can come bare (Future.wait unwraps), e.g.
-  // SocketException or HttpException. Detect by string match — Dart
-  // doesn't expose them through a stable hierarchy.
   if (raw.contains('SocketException') ||
       raw.contains('Failed host lookup')) {
     return HumanError(
-      title: 'Cannot reach server',
-      body: 'Check your internet connection or verify the server is online.',
+      title: tr(context, S.errCannotReachTitle),
+      body: tr(context, S.errCannotReachBody),
       icon: Icons.wifi_off_outlined,
       action: HumanErrorAction.retry,
       rawDetails: raw,
@@ -73,8 +64,8 @@ HumanError humanize(Object error) {
   }
   if (raw.contains('TimeoutException') || raw.contains('timeout')) {
     return HumanError(
-      title: 'Request timed out',
-      body: 'The server took too long to respond. Try again in a moment.',
+      title: tr(context, S.errTimeoutTitle),
+      body: tr(context, S.errTimeoutBody),
       icon: Icons.timer_off_outlined,
       action: HumanErrorAction.retry,
       rawDetails: raw,
@@ -82,61 +73,56 @@ HumanError humanize(Object error) {
   }
 
   return HumanError(
-    title: 'Unexpected error',
-    body: 'Something went wrong. Tap "Show details" to see the raw error.',
+    title: tr(context, S.errUnknownTitle),
+    body: tr(context, S.errUnknownBody),
     icon: Icons.error_outline,
     action: HumanErrorAction.retry,
     rawDetails: raw,
   );
 }
 
-HumanError _humanizeDio(DioException e, String raw) {
-  // Connection-layer failures (no response received yet)
+HumanError _humanizeDio(
+    BuildContext context, DioException e, String raw) {
   switch (e.type) {
     case DioExceptionType.connectionTimeout:
     case DioExceptionType.sendTimeout:
     case DioExceptionType.receiveTimeout:
       return HumanError(
-        title: 'Request timed out',
-        body: 'The server took too long to respond. Check that the daemon '
-            'is running and reachable.',
+        title: tr(context, S.errTimeoutTitle),
+        body: tr(context, S.errTimeoutBody),
         icon: Icons.timer_off_outlined,
         action: HumanErrorAction.retry,
         rawDetails: raw,
       );
     case DioExceptionType.connectionError:
       return HumanError(
-        title: 'Cannot reach server',
-        body: 'No connection to the server. Check your internet, or '
-            'whether the watchlog daemon is up and the URL is correct.',
+        title: tr(context, S.errCannotReachTitle),
+        body: tr(context, S.errCannotReachBody),
         icon: Icons.cloud_off_outlined,
         action: HumanErrorAction.retry,
         rawDetails: raw,
       );
     case DioExceptionType.badCertificate:
       return HumanError(
-        title: 'Certificate problem',
-        body: 'The server\'s TLS certificate is invalid or expired. The '
-            'app refuses to send your token over an insecure connection.',
+        title: tr(context, S.errCertTitle),
+        body: tr(context, S.errCertBody),
         icon: Icons.gpp_bad_outlined,
         rawDetails: raw,
       );
     case DioExceptionType.cancel:
       return HumanError(
-        title: 'Request cancelled',
-        body: 'The request was cancelled.',
+        title: tr(context, S.errCancelledTitle),
+        body: tr(context, S.errCancelledBody),
         icon: Icons.cancel_outlined,
         rawDetails: raw,
       );
     case DioExceptionType.unknown:
-      // Falls through to status-code parsing below if there's a response,
-      // otherwise bare message.
       if (e.response == null) {
         return HumanError(
-          title: 'Network error',
+          title: tr(context, S.errNetworkTitle),
           body: e.message?.isNotEmpty == true
               ? e.message!
-              : 'Request failed before reaching the server.',
+              : tr(context, S.errNetworkBody),
           icon: Icons.signal_wifi_bad_outlined,
           action: HumanErrorAction.retry,
           rawDetails: raw,
@@ -144,7 +130,6 @@ HumanError _humanizeDio(DioException e, String raw) {
       }
       break;
     case DioExceptionType.badResponse:
-      // Handled below by status-code branching.
       break;
   }
 
@@ -152,60 +137,55 @@ HumanError _humanizeDio(DioException e, String raw) {
   switch (status) {
     case 400:
       return HumanError(
-        title: 'Bad request',
-        body: 'The server rejected the request shape. This usually means '
-            'the app and server are on incompatible versions.',
+        title: tr(context, S.errBadRequestTitle),
+        body: tr(context, S.errBadRequestBody),
         icon: Icons.report_outlined,
         action: HumanErrorAction.upgradeBackend,
         rawDetails: raw,
       );
     case 401:
       return HumanError(
-        title: 'Token rejected',
-        body: 'Your device token is invalid or has been revoked. Re-pair '
-            'this server from Settings.',
+        title: tr(context, S.errTokenRejectedTitle),
+        body: tr(context, S.errTokenRejectedBody),
         icon: Icons.lock_outlined,
         action: HumanErrorAction.rePair,
         rawDetails: raw,
       );
     case 403:
       return HumanError(
-        title: 'Permission denied',
-        body: 'Your token doesn\'t include the scope this action needs. '
-            'Re-pair with broader scopes on the server (watchlog api qr).',
+        title: tr(context, S.errPermissionTitle),
+        body: tr(context, S.errPermissionBody),
         icon: Icons.no_accounts_outlined,
         action: HumanErrorAction.rescope,
         rawDetails: raw,
       );
     case 404:
       return HumanError(
-        title: 'Not found',
-        body: 'The server doesn\'t expose this endpoint. The watchlog '
-            'backend may need to be upgraded.',
+        title: tr(context, S.errNotFoundTitle),
+        body: tr(context, S.errNotFoundBody),
         icon: Icons.search_off_outlined,
         action: HumanErrorAction.upgradeBackend,
         rawDetails: raw,
       );
     case 429:
       return HumanError(
-        title: 'Too many requests',
-        body: 'Rate limit hit. Wait a minute, then try again.',
+        title: tr(context, S.errRateLimitTitle),
+        body: tr(context, S.errRateLimitBody),
         icon: Icons.hourglass_empty,
         action: HumanErrorAction.retry,
         rawDetails: raw,
       );
     case 503:
       return HumanError(
-        title: 'No data yet',
-        body: 'The server hasn\'t completed a watchlog run yet, so there '
-            'is no heartbeat to show. Tap "Run now" to trigger one.',
+        title: tr(context, S.errNoDataTitle),
+        body: tr(context, S.errNoDataBody),
         icon: Icons.hourglass_top_outlined,
         rawDetails: raw,
       );
     case null:
       return HumanError(
-        title: 'Network error',
-        body: e.message ?? 'Request failed.',
+        title: tr(context, S.errNetworkTitle),
+        body: e.message ?? tr(context, S.errNetworkBody),
         icon: Icons.signal_wifi_bad_outlined,
         action: HumanErrorAction.retry,
         rawDetails: raw,
@@ -213,18 +193,17 @@ HumanError _humanizeDio(DioException e, String raw) {
     default:
       if (status >= 500) {
         return HumanError(
-          title: 'Server error',
-          body: 'The watchlog daemon returned $status. Check the server '
-              'logs (journalctl -u watchlog-api).',
+          title: tr(context, S.errServerTitle),
+          body: tr(context, S.errServerBody),
           icon: Icons.dns_outlined,
           action: HumanErrorAction.retry,
           rawDetails: raw,
         );
       }
       return HumanError(
-        title: 'Request failed (HTTP $status)',
-        body: 'The server returned an unexpected status. Tap "Show details" '
-            'for the raw response.',
+        title:
+            tr(context, S.errRequestFailedHttp, subs: {'status': '$status'}),
+        body: tr(context, S.errRequestFailedBody),
         icon: Icons.error_outline,
         action: HumanErrorAction.retry,
         rawDetails: raw,
@@ -233,9 +212,8 @@ HumanError _humanizeDio(DioException e, String raw) {
 }
 
 /// Quick one-liner for snackbars when there's no room for a full
-/// [HumanError]. Always falls back to "Failed" if humanizing produces an
-/// empty title for some reason.
-String shortMessage(Object error) {
-  final h = humanize(error);
+/// [HumanError].
+String shortMessage(BuildContext context, Object error) {
+  final h = humanize(context, error);
   return h.title.isNotEmpty ? h.title : 'Failed';
 }

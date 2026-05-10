@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/strings.dart' as tr_strings;
 import '../models/check_info.dart';
 import '../providers/check_info_provider.dart';
 import '../theme.dart';
@@ -190,13 +191,13 @@ class _ExplainerBody extends StatelessWidget {
       children: [
         _Section(
           icon: Icons.search,
-          label: localizedText(_kWhatLabels, locale),
+          label: tr_strings.tr(context, tr_strings.S.whatItChecks),
           body: localizedText(explainer.what, locale),
         ),
         const SizedBox(height: 12),
         _Section(
           icon: Icons.shield_outlined,
-          label: localizedText(_kWhyLabels, locale),
+          label: tr_strings.tr(context, tr_strings.S.whyItMatters),
           body: localizedText(explainer.why, locale),
         ),
         const SizedBox(height: 12),
@@ -204,7 +205,7 @@ class _ExplainerBody extends StatelessWidget {
         const SizedBox(height: 12),
         _Section(
           icon: Icons.handyman_outlined,
-          label: localizedText(_kRemediationLabels, locale),
+          label: tr_strings.tr(context, tr_strings.S.howToFix),
           body: localizedText(explainer.remediation, locale),
           monospace: true,
         ),
@@ -227,10 +228,9 @@ class _CurrentResultBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context);
     return _Section(
       icon: Icons.timeline,
-      label: localizedText(_kNowLabels, locale),
+      label: tr_strings.tr(context, tr_strings.S.rightNow),
       body: data.title,
     );
   }
@@ -336,7 +336,7 @@ class _ActionRow extends StatelessWidget {
                 onClear!();
               },
         icon: const Icon(Icons.notifications_active_outlined),
-        label: const Text('Re-enable'),
+        label: Text(tr_strings.tr(context, tr_strings.S.reEnable)),
       );
     }
     return Row(
@@ -350,7 +350,7 @@ class _ActionRow extends StatelessWidget {
                     onSnooze!();
                   },
             icon: const Icon(Icons.snooze_outlined, size: 18),
-            label: const Text('Snooze 4h'),
+            label: Text(tr_strings.tr(context, tr_strings.S.snooze4h)),
           ),
         ),
         const SizedBox(width: 8),
@@ -363,7 +363,7 @@ class _ActionRow extends StatelessWidget {
                     onIgnore!();
                   },
             icon: const Icon(Icons.notifications_off_outlined, size: 18),
-            label: const Text('Ignore'),
+            label: Text(tr_strings.tr(context, tr_strings.S.ignore)),
           ),
         ),
       ],
@@ -384,22 +384,6 @@ Color _severityColor(String severity) {
   }
 }
 
-const Map<String, String> _kWhatLabels = {
-  'en': 'What it checks',
-  'pl': 'Co sprawdza',
-};
-const Map<String, String> _kWhyLabels = {
-  'en': 'Why it matters',
-  'pl': 'Dlaczego to ważne',
-};
-const Map<String, String> _kNowLabels = {
-  'en': 'Right now',
-  'pl': 'Aktualnie',
-};
-const Map<String, String> _kRemediationLabels = {
-  'en': 'How to fix',
-  'pl': 'Co zrobić',
-};
 
 /// Loading state for the explainer sheet — three placeholder sections
 /// shaped like the eventual "What / Why / How to fix" blocks. The

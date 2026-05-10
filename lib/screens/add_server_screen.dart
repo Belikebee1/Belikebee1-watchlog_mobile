@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/client.dart';
+import '../l10n/strings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/push_provider.dart';
 import '../theme.dart';
@@ -50,7 +51,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
     final url = _urlController.text.trim();
     final token = _tokenController.text.trim();
     if (url.isEmpty || token.isEmpty) {
-      setState(() => _error = 'URL and token are required.');
+      setState(() => _error = tr(context, S.urlAndTokenRequired));
       return;
     }
     setState(() {
@@ -62,7 +63,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
       final ok = await api.verifyToken();
       if (!ok) {
         setState(() {
-          _error = 'Invalid token.';
+          _error = tr(context, S.invalidToken);
           _busy = false;
         });
         return;
@@ -81,12 +82,13 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
       Navigator.of(context).popUntil((route) => route.isFirst);
     } on DioException catch (e) {
       setState(() {
-        _error = 'Network error: ${e.message ?? e.type.name}';
+        _error = tr(context, S.networkErrorPrefix,
+            subs: {'detail': e.message ?? e.type.name});
         _busy = false;
       });
     } catch (e) {
       setState(() {
-        _error = 'Error: $e';
+        _error = tr(context, S.errorPrefix, subs: {'detail': '$e'});
         _busy = false;
       });
     }
@@ -120,7 +122,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                       textAlign: TextAlign.center),
                   const SizedBox(height: 8),
                   Text(
-                    'watchlog',
+                    tr(context, S.watchlogTitle),
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -130,7 +132,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Add your first watchlog server.',
+                    tr(context, S.addFirstServer),
                     style: TextStyle(
                         color: context.surfaces.fgMuted, fontSize: 14),
                     textAlign: TextAlign.center,
@@ -140,17 +142,17 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                 ElevatedButton.icon(
                   onPressed: _busy ? null : _openPairScreen,
                   icon: const Icon(Icons.qr_code_scanner),
-                  label: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 6),
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Text(
-                      'Scan QR code',
-                      style: TextStyle(fontSize: 16),
+                      tr(context, S.scanQrBtn),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'On the server run:  sudo watchlog api qr',
+                  tr(context, S.onServerRunQr),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: context.surfaces.fgMuted.withValues(alpha: 0.9),
@@ -165,7 +167,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        'OR',
+                        tr(context, S.orDivider),
                         style: TextStyle(
                           color: context.surfaces.fgMuted
                               .withValues(alpha: 0.7),
@@ -185,14 +187,14 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                   icon: Icon(_manualExpanded
                       ? Icons.expand_less
                       : Icons.expand_more),
-                  label: const Text('Set up manually (advanced)'),
+                  label: Text(tr(context, S.setupManually)),
                 ),
                 if (_manualExpanded) ...[
                   const SizedBox(height: 8),
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Display name (optional)',
+                    decoration: InputDecoration(
+                      labelText: tr(context, S.displayNameOptional),
                       hintText: 'e.g. ticklist',
                     ),
                   ),
@@ -201,8 +203,8 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                     controller: _urlController,
                     keyboardType: TextInputType.url,
                     autocorrect: false,
-                    decoration: const InputDecoration(
-                      labelText: 'API base URL',
+                    decoration: InputDecoration(
+                      labelText: tr(context, S.apiBaseUrl),
                       hintText: 'https://api.watchlog.pl',
                     ),
                   ),
@@ -212,9 +214,9 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                     obscureText: true,
                     autocorrect: false,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'Bearer token',
-                      hintText: 'paste token',
+                    decoration: InputDecoration(
+                      labelText: tr(context, S.bearerToken),
+                      hintText: tr(context, S.pasteToken),
                     ),
                     onSubmitted: (_) => _submitManual(),
                   ),
@@ -232,7 +234,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                             width: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Add server'),
+                        : Text(tr(context, S.addServerTitle)),
                   ),
                 ],
               ],
@@ -246,7 +248,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
       return Scaffold(body: body);
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Add server')),
+      appBar: AppBar(title: Text(tr(context, S.addServerTitle))),
       body: body,
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/strings.dart';
 import '../models/server.dart';
 import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
@@ -15,19 +17,20 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final servers = ref.watch(serversProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(tr(context, S.settingsTitle))),
       body: ListView(
         children: [
           const SizedBox(height: 8),
-          const _SectionHeader('Servers'),
+          _SectionHeader(tr(context, S.sectionServers)),
           for (final s in servers.servers)
             _ServerTile(
               server: s,
               isActive: s.id == servers.active?.id,
               onSetActive: () =>
                   ref.read(serversProvider.notifier).setActive(s.id),
-              onRename: (newName) =>
-                  ref.read(serversProvider.notifier).renameServer(s.id, newName),
+              onRename: (newName) => ref
+                  .read(serversProvider.notifier)
+                  .renameServer(s.id, newName),
               onRemove: () async {
                 try {
                   await ref.read(pushServiceProvider).onServerRemoved(s);
@@ -37,8 +40,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ListTile(
             leading: const Icon(Icons.add, color: AppColors.accent),
-            title: const Text('Add server…',
-                style: TextStyle(color: AppColors.accent)),
+            title: Text(tr(context, S.addServerEllipsis),
+                style: const TextStyle(color: AppColors.accent)),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AddServerScreen()),
@@ -47,26 +50,25 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: AppColors.red),
-            title: const Text('Sign out of all servers',
-                style: TextStyle(color: AppColors.red)),
+            title: Text(tr(context, S.signOutAll),
+                style: const TextStyle(color: AppColors.red)),
             enabled: servers.servers.isNotEmpty,
             onTap: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   backgroundColor: ctx.surfaces.bgElevated,
-                  title: const Text('Sign out of all servers?'),
-                  content: const Text(
-                      'This removes every server from this device. You will need to add them again to receive alerts.'),
+                  title: Text(tr(ctx, S.signOutAllConfirmTitle)),
+                  content: Text(tr(ctx, S.signOutAllConfirmBody)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancel'),
+                      child: Text(tr(ctx, S.cancel)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('Sign out',
-                          style: TextStyle(color: AppColors.red)),
+                      child: Text(tr(ctx, S.signOutCta),
+                          style: const TextStyle(color: AppColors.red)),
                     ),
                   ],
                 ),
@@ -81,14 +83,17 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           const Divider(),
-          const _SectionHeader('Appearance'),
+          _SectionHeader(tr(context, S.sectionAppearance)),
           const _AppearanceTile(),
+          const Divider(),
+          _SectionHeader(tr(context, S.sectionLanguage)),
+          const _LanguageTile(),
           const Divider(),
           ListTile(
             leading: Icon(Icons.info_outline, color: context.surfaces.fgMuted),
-            title: const Text('About'),
+            title: Text(tr(context, S.sectionAbout)),
             subtitle: Text(
-              'watchlog mobile · v0.1.0\nhttps://watchlog.pl',
+              tr(context, S.aboutBody),
               style: TextStyle(color: context.surfaces.fgMuted),
             ),
           ),
@@ -158,17 +163,18 @@ class _ServerTile extends StatelessWidget {
               context: context,
               builder: (ctx) => AlertDialog(
                 backgroundColor: ctx.surfaces.bgElevated,
-                title: Text('Remove ${server.name}?'),
-                content: const Text(
-                    'This stops alerts from this server on this device.'),
+                title: Text(tr(ctx, S.removeServerTitle, subs: {
+                  'name': server.name,
+                })),
+                content: Text(tr(ctx, S.removeServerBody)),
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('Cancel')),
+                      child: Text(tr(ctx, S.cancel))),
                   TextButton(
                     onPressed: () => Navigator.pop(ctx, true),
-                    child: const Text('Remove',
-                        style: TextStyle(color: AppColors.red)),
+                    child: Text(tr(ctx, S.removeMenu),
+                        style: const TextStyle(color: AppColors.red)),
                   ),
                 ],
               ),
@@ -176,14 +182,15 @@ class _ServerTile extends StatelessWidget {
             if (confirm == true) onRemove();
           }
         },
-        itemBuilder: (ctx) => const [
+        itemBuilder: (ctx) => [
           PopupMenuItem<String>(
             value: 'rename',
-            child: Text('Rename'),
+            child: Text(tr(ctx, S.renameMenu)),
           ),
           PopupMenuItem<String>(
             value: 'remove',
-            child: Text('Remove', style: TextStyle(color: AppColors.red)),
+            child: Text(tr(ctx, S.removeMenu),
+                style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -196,19 +203,19 @@ class _ServerTile extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ctx.surfaces.bgElevated,
-        title: const Text('Rename server'),
+        title: Text(tr(ctx, S.renameServer)),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(labelText: 'Display name'),
+          decoration: InputDecoration(labelText: tr(ctx, S.displayName)),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel')),
+              child: Text(tr(ctx, S.cancel))),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
-            child: const Text('Save'),
+            child: Text(tr(ctx, S.save)),
           ),
         ],
       ),
@@ -217,10 +224,6 @@ class _ServerTile extends StatelessWidget {
 }
 
 /// "Appearance" row — three-segment toggle: System / Light / Dark.
-///
-/// We use a SegmentedButton rather than a dialog/dropdown so the user
-/// sees all three options at once and can toggle with a single tap. The
-/// chosen mode persists in secure storage via [themeModeProvider].
 class _AppearanceTile extends ConsumerWidget {
   const _AppearanceTile();
 
@@ -232,29 +235,29 @@ class _AppearanceTile extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              'Theme',
-              style: TextStyle(fontSize: 14),
+              tr(context, S.themeLabel),
+              style: const TextStyle(fontSize: 14),
             ),
           ),
           SegmentedButton<ThemeMode>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: ThemeMode.system,
-                label: Text('System'),
-                icon: Icon(Icons.brightness_auto_outlined),
+                label: Text(tr(context, S.themeSystem)),
+                icon: const Icon(Icons.brightness_auto_outlined),
               ),
               ButtonSegment(
                 value: ThemeMode.light,
-                label: Text('Light'),
-                icon: Icon(Icons.light_mode_outlined),
+                label: Text(tr(context, S.themeLight)),
+                icon: const Icon(Icons.light_mode_outlined),
               ),
               ButtonSegment(
                 value: ThemeMode.dark,
-                label: Text('Dark'),
-                icon: Icon(Icons.dark_mode_outlined),
+                label: Text(tr(context, S.themeDark)),
+                icon: const Icon(Icons.dark_mode_outlined),
               ),
             ],
             selected: {mode},
@@ -266,6 +269,56 @@ class _AppearanceTile extends ConsumerWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// "Language" row — three-segment toggle: System / English / Polski.
+///
+/// Forces a specific language regardless of the system locale, or follows
+/// the OS when set to System. Persists via [localeProvider].
+class _LanguageTile extends ConsumerWidget {
+  const _LanguageTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Tri-state encoded as a String key because SegmentedButton can't
+    // deal with nullable values directly.
+    final locale = ref.watch(localeProvider);
+    final selected = locale == null
+        ? 'system'
+        : (locale.languageCode == 'pl' ? 'pl' : 'en');
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: SegmentedButton<String>(
+        segments: [
+          ButtonSegment(
+            value: 'system',
+            label: Text(tr(context, S.langSystem)),
+            icon: const Icon(Icons.translate),
+          ),
+          ButtonSegment(
+            value: 'en',
+            label: Text(tr(context, S.langEnglish)),
+          ),
+          ButtonSegment(
+            value: 'pl',
+            label: Text(tr(context, S.langPolish)),
+          ),
+        ],
+        selected: {selected},
+        showSelectedIcon: false,
+        onSelectionChanged: (set) {
+          final v = set.isEmpty ? 'system' : set.first;
+          final next = switch (v) {
+            'en' => const Locale('en'),
+            'pl' => const Locale('pl'),
+            _ => null,
+          };
+          ref.read(localeProvider.notifier).setLocale(next);
+        },
       ),
     );
   }

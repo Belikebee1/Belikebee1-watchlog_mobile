@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/models.dart';
+import '../l10n/strings.dart';
 import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
@@ -73,11 +74,11 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('👁️  watchlog'),
+        title: Text(tr(context, S.watchlogBrand)),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Settings',
+            tooltip: tr(context, S.settingsTitle),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -101,7 +102,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
           : FloatingActionButton.extended(
               onPressed: _onAddServer,
               icon: const Icon(Icons.add),
-              label: const Text('Add server'),
+              label: Text(tr(context, S.addServerFab)),
             ),
     );
   }
@@ -120,7 +121,7 @@ class _EmptyServers extends StatelessWidget {
         const Center(child: Text('👁️', style: TextStyle(fontSize: 64))),
         const SizedBox(height: 16),
         Text(
-          'No servers yet',
+          tr(context, S.noServersYet),
           textAlign: TextAlign.center,
           style: TextStyle(
             color: context.surfaces.fg,
@@ -130,7 +131,7 @@ class _EmptyServers extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Pair your first watchlog server to see its health here.',
+          tr(context, S.noServersHint),
           textAlign: TextAlign.center,
           style: TextStyle(color: context.surfaces.fgMuted),
         ),
@@ -139,7 +140,7 @@ class _EmptyServers extends StatelessWidget {
           child: ElevatedButton.icon(
             onPressed: onAdd,
             icon: const Icon(Icons.qr_code_scanner),
-            label: const Text('Pair server'),
+            label: Text(tr(context, S.pairServerCta)),
           ),
         ),
       ],
@@ -269,7 +270,7 @@ class _CardError extends StatelessWidget {
                   )),
               const SizedBox(height: 2),
               Text(
-                humanize(error).title,
+                humanize(context, error).title,
                 style: const TextStyle(color: AppColors.red, fontSize: 12),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -342,7 +343,7 @@ class _CardLoaded extends StatelessWidget {
                       )),
                   const SizedBox(height: 2),
                   Text(
-                    _summaryLine(worst, actionable),
+                    _summaryLine(context, worst, actionable),
                     style: TextStyle(color: color, fontSize: 13),
                   ),
                 ],
@@ -350,7 +351,7 @@ class _CardLoaded extends StatelessWidget {
             ),
             if (age != null)
               Text(
-                _ageString(age),
+                _ageString(context, age),
                 style: TextStyle(
                     color: context.surfaces.fgMuted, fontSize: 11),
               ),
@@ -362,24 +363,28 @@ class _CardLoaded extends StatelessWidget {
     );
   }
 
-  String _summaryLine(String severity, int actionable) {
+  String _summaryLine(BuildContext context, String severity, int actionable) {
     switch (severity.toUpperCase()) {
       case 'CRITICAL':
-        return 'CRITICAL · $actionable to fix';
+        return tr(context, S.summaryCriticalFix, subs: {'n': '$actionable'});
       case 'WARN':
-        return 'WARN · $actionable to look at';
+        return tr(context, S.summaryWarnLook, subs: {'n': '$actionable'});
       case 'INFO':
-        return 'INFO · $actionable advisory';
+        return tr(context, S.summaryInfoAdvisory, subs: {'n': '$actionable'});
       default:
-        return 'All checks passing';
+        return tr(context, S.summaryAllPassing);
     }
   }
 
-  String _ageString(Duration age) {
-    if (age.inMinutes < 1) return 'just now';
-    if (age.inMinutes < 60) return '${age.inMinutes}m ago';
-    if (age.inHours < 24) return '${age.inHours}h ago';
-    return '${age.inDays}d ago';
+  String _ageString(BuildContext context, Duration age) {
+    if (age.inMinutes < 1) return tr(context, S.ageJustNow);
+    if (age.inMinutes < 60) {
+      return tr(context, S.ageMinutesAgo, subs: {'n': '${age.inMinutes}'});
+    }
+    if (age.inHours < 24) {
+      return tr(context, S.ageHoursAgo, subs: {'n': '${age.inHours}'});
+    }
+    return tr(context, S.ageDaysAgo, subs: {'n': '${age.inDays}'});
   }
 }
 

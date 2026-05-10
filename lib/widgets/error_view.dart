@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/strings.dart';
 import '../theme.dart';
 import '../utils/error_humanizer.dart';
 
@@ -12,28 +13,30 @@ import '../utils/error_humanizer.dart';
 /// implies an actionable next step (re-pair, upgrade backend), the
 /// caller can wire those buttons via [onSecondaryAction].
 class ErrorView extends StatefulWidget {
-  final HumanError error;
+  /// Either an already-humanized [HumanError] or a raw exception. The
+  /// raw form lets callers pass `e` from `asyncProvider.when(error: ...)`
+  /// without first humanizing — we run it through [humanize] in build()
+  /// where we have a [BuildContext] for localization.
+  final Object errorOrHumanized;
   final VoidCallback? onRetry;
   final VoidCallback? onSecondaryAction;
   final String? secondaryActionLabel;
 
   const ErrorView({
     super.key,
-    required this.error,
+    required HumanError error,
     this.onRetry,
     this.onSecondaryAction,
     this.secondaryActionLabel,
-  });
+  }) : errorOrHumanized = error;
 
-  /// Convenience constructor: takes a raw exception, runs it through
-  /// [humanize], and assembles the view.
-  ErrorView.from(
+  const ErrorView.from(
     Object exception, {
     super.key,
     this.onRetry,
     this.onSecondaryAction,
     this.secondaryActionLabel,
-  }) : error = humanize(exception);
+  }) : errorOrHumanized = exception;
 
   @override
   State<ErrorView> createState() => _ErrorViewState();
@@ -44,6 +47,9 @@ class _ErrorViewState extends State<ErrorView> {
 
   @override
   Widget build(BuildContext context) {
+    final humanError = widget.errorOrHumanized is HumanError
+        ? widget.errorOrHumanized as HumanError
+        : humanize(context, widget.errorOrHumanized);
     final color = AppColors.red;
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -57,11 +63,11 @@ class _ErrorViewState extends State<ErrorView> {
             color: color.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(widget.error.icon, color: color, size: 32),
+          child: Icon(humanError.icon, color: color, size: 32),
         ),
         const SizedBox(height: 16),
         Text(
-          widget.error.title,
+          humanError.title,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: context.surfaces.fg,
@@ -71,7 +77,7 @@ class _ErrorViewState extends State<ErrorView> {
         ),
         const SizedBox(height: 8),
         Text(
-          widget.error.body,
+          humanError.body,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: context.surfaces.fgMuted,
@@ -85,7 +91,7 @@ class _ErrorViewState extends State<ErrorView> {
             child: ElevatedButton.icon(
               onPressed: widget.onRetry,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Try again'),
+              label: Text(tr(context, S.tryAgain)),
             ),
           ),
         if (widget.onSecondaryAction != null) ...[
@@ -93,7 +99,8 @@ class _ErrorViewState extends State<ErrorView> {
           Center(
             child: TextButton(
               onPressed: widget.onSecondaryAction,
-              child: Text(widget.secondaryActionLabel ?? 'More options'),
+              child: Text(
+                  widget.secondaryActionLabel ?? tr(context, S.moreOptions)),
             ),
           ),
         ],
@@ -107,7 +114,9 @@ class _ErrorViewState extends State<ErrorView> {
               color: context.surfaces.fgMuted,
             ),
             label: Text(
-              _showDetails ? 'Hide details' : 'Show details',
+              _showDetails
+                  ? tr(context, S.hideDetails)
+                  : tr(context, S.showDetails),
               style: TextStyle(color: context.surfaces.fgMuted),
             ),
           ),
@@ -128,7 +137,7 @@ class _ErrorViewState extends State<ErrorView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Raw error',
+                      tr(context, S.rawErrorLabel),
                       style: TextStyle(
                         color: context.surfaces.fgMuted,
                         fontSize: 11,
@@ -139,12 +148,12 @@ class _ErrorViewState extends State<ErrorView> {
                     InkWell(
                       onTap: () {
                         Clipboard.setData(
-                          ClipboardData(text: widget.error.rawDetails),
+                          ClipboardData(text: humanError.rawDetails),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Copied to clipboard'),
-                            duration: Duration(seconds: 1),
+                          SnackBar(
+                            content: Text(tr(context, S.copyToClipboard)),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
@@ -161,7 +170,7 @@ class _ErrorViewState extends State<ErrorView> {
                 ),
                 const SizedBox(height: 6),
                 SelectableText(
-                  widget.error.rawDetails,
+                  humanError.rawDetails,
                   style: TextStyle(
                     color: context.surfaces.fg,
                     fontSize: 11,

@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
+import 'providers/locale_provider.dart';
 import 'providers/push_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/add_server_screen.dart';
@@ -43,9 +45,10 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
 
   Future<void> _bootstrap() async {
     await ref.read(authProvider.notifier).load();
-    // Theme mode persists across launches; loading runs in parallel with
-    // the auth load above. Both are local secure-storage reads — fast.
+    // Theme + locale mode persist across launches; both are local
+    // secure-storage reads — fast, run sequentially.
     await ref.read(themeModeProvider.notifier).load();
+    await ref.read(localeProvider.notifier).load();
     // Init push (may fail silently if Firebase not configured — that's OK)
     try {
       await ref.read(pushServiceProvider).initialize();
@@ -59,12 +62,20 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
     return MaterialApp(
       title: 'watchlog',
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: themeMode,
+      locale: locale,
+      supportedLocales: const [Locale('en'), Locale('pl')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       home: !_bootstrapped
           ? const _Splash()
           : auth.isAuthenticated

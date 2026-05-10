@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/strings.dart' as l10n;
 import '../models/check_info.dart';
 import '../providers/check_info_provider.dart';
 import '../theme.dart';
@@ -53,7 +54,7 @@ class SeverityLegendSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              localizedText(_kHeading, locale),
+              l10n.tr(context, l10n.S.severityLevels),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -139,11 +140,6 @@ class _LegendRow extends StatelessWidget {
 }
 
 const List<String> _kOrder = ['OK', 'INFO', 'WARN', 'CRITICAL'];
-
-const Map<String, String> _kHeading = {
-  'en': 'Severity levels',
-  'pl': 'Poziomy ważności',
-};
 
 Color _colorFor(String level) {
   switch (level) {

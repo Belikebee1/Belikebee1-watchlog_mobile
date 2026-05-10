@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/models.dart';
+import '../l10n/strings.dart';
 import '../providers/auth_provider.dart';
+import '../providers/host_info_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
-import '../providers/host_info_provider.dart';
 import '../utils/error_humanizer.dart';
 import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
@@ -58,20 +59,21 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(const SnackBar(content: Text('Running watchlog…')));
+    messenger.showSnackBar(
+        SnackBar(content: Text(tr(context, S.runningWatchlog))));
     try {
       final result = await api.runWatchlog();
       if (!mounted) return;
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              OutputScreen(title: 'watchlog run', result: result),
+          builder: (ctx) => OutputScreen(
+              title: tr(ctx, S.watchlogRunTitle), result: result),
         ),
       );
       _refresh();
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(shortMessage(e))));
+      messenger.showSnackBar(SnackBar(content: Text(shortMessage(context, e))));
     }
   }
 
@@ -82,18 +84,15 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: ctx.surfaces.bgElevated,
-        title: const Text('Apply security updates?'),
-        content: const Text(
-          'This will run `unattended-upgrade -v` on the server. '
-          'It may install patches and (rarely) require a service restart.',
-        ),
+        title: Text(tr(ctx, S.applySecurityConfirmTitle)),
+        content: Text(tr(ctx, S.applySecurityConfirmBody)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(tr(ctx, S.cancel))),
           ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Apply')),
+              child: Text(tr(ctx, S.applySecurityCta))),
         ],
       ),
     );
@@ -101,20 +100,20 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
 
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(
-        const SnackBar(content: Text('Applying security updates…')));
+        SnackBar(content: Text(tr(context, S.applyingSecurity))));
     try {
       final result = await api.applySecurityUpdates();
       if (!mounted) return;
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              OutputScreen(title: 'Apply security updates', result: result),
+          builder: (ctx) => OutputScreen(
+              title: tr(ctx, S.applySecurityTitle), result: result),
         ),
       );
       _refresh();
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(shortMessage(e))));
+      messenger.showSnackBar(SnackBar(content: Text(shortMessage(context, e))));
     }
   }
 
@@ -125,12 +124,13 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       await api.snooze(check, 4);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Snoozed $check for 4h')),
+        SnackBar(
+            content: Text(tr(context, S.snackSnoozed, subs: {'check': check}))),
       );
       _refresh();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(shortMessage(e))),
+        SnackBar(content: Text(shortMessage(context, e))),
       );
     }
   }
@@ -142,12 +142,13 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       await api.ignore(check);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ignored $check')),
+        SnackBar(
+            content: Text(tr(context, S.snackIgnored, subs: {'check': check}))),
       );
       _refresh();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(shortMessage(e))),
+        SnackBar(content: Text(shortMessage(context, e))),
       );
     }
   }
@@ -160,7 +161,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       await api.unignore(check);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cleared $check')),
+        SnackBar(
+            content: Text(tr(context, S.snackCleared, subs: {'check': check}))),
       );
       _refresh();
     } catch (_) {}
@@ -195,7 +197,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
             e,
             onRetry: _refresh,
             onSecondaryAction:
-                humanize(e).action == HumanErrorAction.rePair
+                humanize(context, e).action == HumanErrorAction.rePair
                     ? () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -204,8 +206,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                         )
                     : null,
             secondaryActionLabel:
-                humanize(e).action == HumanErrorAction.rePair
-                    ? 'Open settings'
+                humanize(context, e).action == HumanErrorAction.rePair
+                    ? tr(context, S.openSettings)
                     : null,
           ),
           data: (combined) =>
@@ -240,7 +242,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       rows.add(CheckRowData(
         check: entry.key,
         severity: 'INFO',
-        title: '(snoozed)',
+        title: tr(context, S.snoozedRow),
         silenced: SilencedKind.snoozed,
       ));
     }
@@ -249,7 +251,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       rows.add(CheckRowData(
         check: entry.key,
         severity: 'INFO',
-        title: '(ignored)',
+        title: tr(context, S.ignoredRow),
         silenced: SilencedKind.ignored,
       ));
     }
@@ -267,7 +269,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               child: ElevatedButton.icon(
                 onPressed: _applySecurity,
                 icon: const Icon(Icons.check_circle_outline),
-                label: const Text('Apply security'),
+                label: Text(tr(context, S.applySecurityBtn)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.green,
                 ),
@@ -278,7 +280,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               child: OutlinedButton.icon(
                 onPressed: _runWatchlog,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Run now'),
+                label: Text(tr(context, S.runNowBtn)),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: context.surfaces.border),
                   foregroundColor: context.surfaces.fg,
@@ -299,10 +301,10 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                 children: [
                   const Text('✅', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 8),
-                  Text('All checks passing.',
+                  Text(tr(context, S.allChecksPassing),
                       style: TextStyle(color: context.surfaces.fg)),
                   const SizedBox(height: 4),
-                  Text('Nothing to act on.',
+                  Text(tr(context, S.nothingToActOn),
                       style: TextStyle(color: context.surfaces.fgMuted)),
                 ],
               ),

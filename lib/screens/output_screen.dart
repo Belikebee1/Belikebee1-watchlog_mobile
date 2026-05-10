@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../api/models.dart';
+import '../l10n/strings.dart';
 import '../theme.dart';
 
 class OutputScreen extends StatelessWidget {
@@ -18,12 +19,12 @@ class OutputScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.copy_outlined),
-            tooltip: 'Copy output',
+            tooltip: tr(context, S.copyOutputTooltip),
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: result.output));
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Copied to clipboard')),
+                  SnackBar(content: Text(tr(context, S.copyToClipboard))),
                 );
               }
             },
@@ -52,14 +53,16 @@ class OutputScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    ok ? 'Success' : 'Failed',
+                    ok ? tr(context, S.successLabel) : tr(context, S.failedLabel),
                     style: TextStyle(
                       color: ok ? AppColors.green : AppColors.red,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const Spacer(),
-                  Text('exit ${result.exitCode}',
+                  Text(
+                      tr(context, S.exitCode,
+                          subs: {'n': '${result.exitCode}'}),
                       style: TextStyle(color: context.surfaces.fgMuted)),
                 ],
               ),
@@ -84,7 +87,9 @@ class OutputScreen extends StatelessWidget {
                 ),
                 child: SingleChildScrollView(
                   child: SelectableText(
-                    result.output.isEmpty ? '(no output)' : result.output,
+                    result.output.isEmpty
+                        ? tr(context, S.noOutput)
+                        : result.output,
                     style: TextStyle(
                       color: context.surfaces.fg,
                       fontFamily: 'monospace',

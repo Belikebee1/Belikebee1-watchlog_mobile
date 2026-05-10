@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../api/client.dart';
+import '../l10n/strings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/push_provider.dart';
 import '../theme.dart';
@@ -71,7 +72,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
   }) async {
     if (_busy) return;
     if (baseUrl.trim().isEmpty || code.trim().isEmpty) {
-      setState(() => _error = 'Server URL and code are required.');
+      setState(() => _error = tr(context, S.serverUrlAndCodeRequired));
       return;
     }
     await _attemptPair(baseUrl: baseUrl.trim(), code: code.trim());
@@ -94,7 +95,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
       );
       if (result == null) {
         setState(() {
-          _error = 'Invalid, expired, or already-used code.';
+          _error = tr(context, S.invalidCode);
           _busy = false;
         });
         if (!_manualMode) {
@@ -122,7 +123,8 @@ class _PairScreenState extends ConsumerState<PairScreen> {
       Navigator.of(context).popUntil((route) => route.isFirst);
     } on DioException catch (e) {
       setState(() {
-        _error = 'Network error: ${e.message ?? e.type.name}';
+        _error = tr(context, S.networkErrorPrefix,
+            subs: {'detail': e.message ?? e.type.name});
         _busy = false;
       });
       if (!_manualMode) {
@@ -132,7 +134,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
       }
     } catch (e) {
       setState(() {
-        _error = 'Error: $e';
+        _error = tr(context, S.errorPrefix, subs: {'detail': '$e'});
         _busy = false;
       });
       if (!_manualMode) {
@@ -164,7 +166,9 @@ class _PairScreenState extends ConsumerState<PairScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_manualMode ? 'Enter code manually' : 'Scan pairing QR'),
+        title: Text(_manualMode
+            ? tr(context, S.enterCodeManually)
+            : tr(context, S.scanPairingQr)),
         leading: widget.isFirstRun
             ? null
             : IconButton(
@@ -174,7 +178,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
         actions: [
           if (!_manualMode)
             IconButton(
-              tooltip: 'Toggle torch',
+              tooltip: tr(context, S.toggleTorch),
               icon: const Icon(Icons.flash_on),
               onPressed: () => _scannerController.toggleTorch(),
             ),
@@ -199,7 +203,9 @@ class _PairScreenState extends ConsumerState<PairScreen> {
                     }
                   },
             child: Text(
-              _manualMode ? 'Use camera scanner' : 'Enter code manually',
+              _manualMode
+                  ? tr(context, S.useCameraScanner)
+                  : tr(context, S.enterCodeManually),
               style: const TextStyle(color: AppColors.accent),
             ),
           ),
@@ -248,7 +254,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Text(
-            'On the server, run:  sudo watchlog api qr',
+            tr(context, S.onServerRunQr),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: context.surfaces.fgMuted.withValues(alpha: 0.9),
@@ -307,7 +313,7 @@ class _ManualPairFormState extends State<_ManualPairForm> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Run on the server:\nsudo watchlog api qr',
+              tr(context, S.runOnServerMultiline),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: context.surfaces.fgMuted,
@@ -320,8 +326,8 @@ class _ManualPairFormState extends State<_ManualPairForm> {
               controller: _urlController,
               keyboardType: TextInputType.url,
               autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'Server URL',
+              decoration: InputDecoration(
+                labelText: tr(context, S.serverUrl),
                 hintText: 'https://api.watchlog.pl',
               ),
             ),
@@ -332,8 +338,8 @@ class _ManualPairFormState extends State<_ManualPairForm> {
               enableSuggestions: false,
               textCapitalization: TextCapitalization.characters,
               maxLength: 16,
-              decoration: const InputDecoration(
-                labelText: 'Pairing code',
+              decoration: InputDecoration(
+                labelText: tr(context, S.pairingCode),
                 hintText: 'e.g. K3M9XR',
                 counterText: '',
               ),
@@ -361,7 +367,7 @@ class _ManualPairFormState extends State<_ManualPairForm> {
                       width: 18,
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: context.surfaces.bg))
-                  : const Text('Pair'),
+                  : Text(tr(context, S.pairBtn)),
             ),
           ],
         ),
@@ -402,10 +408,11 @@ class _ScannerErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final reason = switch (error.errorCode) {
       MobileScannerErrorCode.permissionDenied =>
-        'Camera permission denied. Grant camera access in Settings or pair with a typed code instead.',
-      MobileScannerErrorCode.unsupported =>
-        "This device doesn't support QR scanning. Use the manual code entry.",
-      _ => 'Camera error: ${error.errorDetails?.message ?? error.errorCode.name}',
+        tr(context, S.cameraPermissionDenied),
+      MobileScannerErrorCode.unsupported => tr(context, S.scannerUnsupported),
+      _ => tr(context, S.cameraError, subs: {
+            'detail': error.errorDetails?.message ?? error.errorCode.name,
+          }),
     };
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -423,7 +430,7 @@ class _ScannerErrorView extends StatelessWidget {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: onSwitchManual,
-            child: const Text('Enter code manually'),
+            child: Text(tr(context, S.enterCodeManually)),
           ),
         ],
       ),

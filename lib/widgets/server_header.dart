@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/strings.dart';
 import '../models/host_info.dart';
 import '../providers/host_info_provider.dart';
 import '../theme.dart';
@@ -104,7 +105,8 @@ class _CompactStrip extends StatelessWidget {
                     ),
                   if (uptimeShort != null)
                     _ChipText(
-                      text: 'up $uptimeShort',
+                      text: tr(context, S.upPrefix,
+                          subs: {'duration': uptimeShort}),
                       icon: Icons.schedule,
                     ),
                   if (ip != null)
@@ -229,49 +231,50 @@ class _HostInfoSheet extends StatelessWidget {
                 ),
               ),
             const SizedBox(height: 16),
-            ..._buildRows(),
+            ..._buildRows(context),
           ],
         ),
       ),
     );
   }
 
-  List<Widget> _buildRows() {
+  List<Widget> _buildRows(BuildContext context) {
     final rows = <Widget>[];
     void add(String label, String? value) {
       if (value == null || value.isEmpty) return;
       rows.add(_DetailRow(label: label, value: value));
     }
 
-    add('Operating system', info.os?.label);
-    add('Kernel', info.kernel);
-    add('Architecture', info.arch);
+    add(tr(context, S.operatingSystem), info.os?.label);
+    add(tr(context, S.kernel), info.kernel);
+    add(tr(context, S.architecture), info.arch);
     if (info.cpuModel != null || info.cpuCores != null) {
-      final cores = info.cpuCores != null
-          ? '${info.cpuCores} core${info.cpuCores == 1 ? "" : "s"}'
+      final coresLabel = info.cpuCores != null
+          ? '${info.cpuCores} ${info.cpuCores == 1 ? tr(context, S.cores) : tr(context, S.coresPlural)}'
           : null;
-      final cpu = [info.cpuModel, cores]
+      final cpu = [info.cpuModel, coresLabel]
           .where((s) => s != null && s.isNotEmpty)
           .join(' · ');
-      add('CPU', cpu);
+      add(tr(context, S.cpuLabel), cpu);
     }
     if (info.ramTotalMb != null) {
-      add('RAM', '${(info.ramTotalMb! / 1024).toStringAsFixed(1)} GB');
+      add(tr(context, S.ramLabel),
+          '${(info.ramTotalMb! / 1024).toStringAsFixed(1)} GB');
     }
     if (info.diskTotalGb != null) {
-      add('Disk total (/)', '${info.diskTotalGb} GB');
+      add(tr(context, S.diskTotalRoot), '${info.diskTotalGb} GB');
     }
     if (info.uptimeSeconds != null) {
-      add('Uptime', _uptimeLong(info.uptimeSeconds!));
+      add(tr(context, S.uptime), _uptimeLong(info.uptimeSeconds!));
     }
     if (info.bootTime != null) {
-      add('Booted', _formatBootTime(info.bootTime!));
+      add(tr(context, S.booted), _formatBootTime(info.bootTime!));
     }
-    add('Timezone', info.timezone);
+    add(tr(context, S.timezone), info.timezone);
 
     if (info.ipAddresses.isNotEmpty) {
       rows.add(const SizedBox(height: 8));
-      rows.add(const _SectionLabel(text: 'NETWORK'));
+      rows.add(_SectionLabel(text: tr(context, S.networkSection)));
       for (final ip in info.ipAddresses) {
         rows.add(_DetailRow(
           label: '${ip.interface} (${ip.family})',

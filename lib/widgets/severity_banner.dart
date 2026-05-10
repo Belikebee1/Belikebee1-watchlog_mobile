@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../api/models.dart';
+import '../l10n/strings.dart';
 import '../theme.dart';
 
 class SeverityBanner extends StatelessWidget {
@@ -23,14 +24,14 @@ class SeverityBanner extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('No heartbeat yet',
+                    Text(tr(context, S.noHeartbeat),
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: context.surfaces.fg)),
                     const SizedBox(height: 4),
                     Text(
-                      'Run watchlog at least once on the server.',
+                      tr(context, S.noHeartbeatHint),
                       style: TextStyle(
                           color: context.surfaces.fgMuted, fontSize: 13),
                     ),
@@ -48,12 +49,14 @@ class SeverityBanner extends StatelessWidget {
     final emoji = severityEmoji(s.worstSeverity);
     final age = s.age;
     final ageStr = age.inMinutes < 60
-        ? '${age.inMinutes} min ago'
-        : '${(age.inMinutes / 60).toStringAsFixed(1)} h ago';
+        ? tr(context, S.ageMinAgo, subs: {'n': '${age.inMinutes}'})
+        : tr(context, S.ageHAgo,
+            subs: {'n': (age.inMinutes / 60).toStringAsFixed(1)});
 
     final title = (s.worstSeverity == 'OK' || s.worstSeverity == 'INFO')
-        ? 'All clear – ${s.checksTotal} checks'
-        : '${s.actionable.length} item(s) need attention';
+        ? tr(context, S.allClearN, subs: {'n': '${s.checksTotal}'})
+        : tr(context, S.itemsNeedAttention,
+            subs: {'n': '${s.actionable.length}'});
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -87,7 +90,7 @@ class SeverityBanner extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.refresh, color: context.surfaces.fgMuted),
               onPressed: onRefresh,
-              tooltip: 'Refresh',
+              tooltip: tr(context, S.refreshTooltip),
             ),
           ],
         ),

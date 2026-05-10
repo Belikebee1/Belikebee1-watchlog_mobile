@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/strings.dart';
 import '../theme.dart';
 
 enum SilencedKind { none, snoozed, ignored }
@@ -40,9 +41,9 @@ class CheckRow extends StatelessWidget {
 
     Widget? badge;
     if (data.silenced == SilencedKind.snoozed) {
-      badge = _badge('snoozed', AppColors.accent);
+      badge = _badge(tr(context, S.snoozedBadge), AppColors.accent);
     } else if (data.silenced == SilencedKind.ignored) {
-      badge = _badge('ignored', AppColors.red);
+      badge = _badge(tr(context, S.ignoredBadge), AppColors.red);
     }
 
     return Opacity(
@@ -89,9 +90,9 @@ class CheckRow extends StatelessWidget {
                   Wrap(
                     spacing: 4,
                     children: [
-                      _smallBtn(context, 'Snooze 4h', onSnooze),
-                      _smallBtn(context, 'Ignore', onIgnore),
-                      _smallBtn(context, 'Clear', onClear),
+                      _smallBtn(context, tr(context, S.snooze4h), onSnooze),
+                      _smallBtn(context, tr(context, S.ignore), onIgnore),
+                      _smallBtn(context, tr(context, S.clear), onClear),
                     ],
                   ),
                 ],
