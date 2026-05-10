@@ -9,6 +9,7 @@ import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
 import 'add_server_screen.dart';
+import 'notification_settings_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -37,6 +38,13 @@ class SettingsScreen extends ConsumerWidget {
                 } catch (_) {}
                 await ref.read(serversProvider.notifier).removeServer(s.id);
               },
+              onOpenNotifications: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      NotificationSettingsScreen(serverId: s.id),
+                ),
+              ),
             ),
           ListTile(
             leading: const Icon(Icons.add, color: AppColors.accent),
@@ -128,6 +136,7 @@ class _ServerTile extends StatelessWidget {
   final VoidCallback onSetActive;
   final ValueChanged<String> onRename;
   final VoidCallback onRemove;
+  final VoidCallback onOpenNotifications;
 
   const _ServerTile({
     required this.server,
@@ -135,6 +144,7 @@ class _ServerTile extends StatelessWidget {
     required this.onSetActive,
     required this.onRename,
     required this.onRemove,
+    required this.onOpenNotifications,
   });
 
   @override
@@ -153,7 +163,9 @@ class _ServerTile extends StatelessWidget {
       trailing: PopupMenuButton<String>(
         icon: Icon(Icons.more_vert, color: context.surfaces.fgMuted),
         onSelected: (value) async {
-          if (value == 'rename') {
+          if (value == 'notifications') {
+            onOpenNotifications();
+          } else if (value == 'rename') {
             final newName = await _promptRename(context, server.name);
             if (newName != null && newName.trim().isNotEmpty) {
               onRename(newName);
@@ -183,6 +195,10 @@ class _ServerTile extends StatelessWidget {
           }
         },
         itemBuilder: (ctx) => [
+          PopupMenuItem<String>(
+            value: 'notifications',
+            child: Text(tr(ctx, S.notificationsMenu)),
+          ),
           PopupMenuItem<String>(
             value: 'rename',
             child: Text(tr(ctx, S.renameMenu)),

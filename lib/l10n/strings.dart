@@ -349,6 +349,58 @@ class S {
     'pl': 'Skopiuj wynik',
   };
 
+  // ----- Notification preferences (Phase 2E) -----
+  static const notificationsMenu = {
+    'en': 'Notifications…',
+    'pl': 'Powiadomienia…',
+  };
+  static const notificationsTitle = {
+    'en': 'Notifications',
+    'pl': 'Powiadomienia',
+  };
+  static const sectionQuietHours = {
+    'en': 'Quiet hours',
+    'pl': 'Ciche godziny',
+  };
+  static const quietHoursToggle = {
+    'en': 'Enable quiet hours',
+    'pl': 'Włącz ciche godziny',
+  };
+  static const quietStartLabel = {'en': 'Start', 'pl': 'Początek'};
+  static const quietEndLabel = {'en': 'End', 'pl': 'Koniec'};
+  static const quietOverrideLabel = {
+    'en': 'Always deliver at or above',
+    'pl': 'Zawsze dostarcz przy lub powyżej',
+  };
+  static const sectionFloor = {
+    'en': 'Severity floor',
+    'pl': 'Próg ważności',
+  };
+  static const minSeverityLabel = {
+    'en': 'Never push below',
+    'pl': 'Nigdy nie wysyłaj poniżej',
+  };
+  static const sevOk = {'en': 'OK', 'pl': 'OK'};
+  static const sevInfo = {'en': 'Info', 'pl': 'Info'};
+  static const sevWarn = {'en': 'Warning', 'pl': 'Ostrzeżenie'};
+  static const sevCritical = {'en': 'Critical', 'pl': 'Krytyczne'};
+  static const quietHoursHint = {
+    'en':
+        'Inside the window, alerts below the override threshold are silenced. Times are in this device\'s local clock.',
+    'pl':
+        'Wewnątrz okna alerty poniżej progu są wyciszane. Godziny w czasie lokalnym tego urządzenia.',
+  };
+  static const minSeverityHint = {
+    'en':
+        'A global floor — alerts below this never push, regardless of quiet hours.',
+    'pl':
+        'Globalny próg — alerty poniżej nigdy nie wysyłają, niezależnie od cichych godzin.',
+  };
+  static const prefsSavedSnack = {
+    'en': 'Notification preferences saved',
+    'pl': 'Zapisano ustawienia powiadomień',
+  };
+
   // ----- Errors (humanizer) -----
   static const errCannotReachTitle = {
     'en': 'Cannot reach server',

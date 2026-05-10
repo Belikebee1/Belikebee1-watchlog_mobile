@@ -176,6 +176,28 @@ class WatchlogApi {
     return resp.data!;
   }
 
+  /// Fetch the notification preferences associated with this device's
+  /// API token. The server identifies the calling token from the
+  /// Bearer header.
+  Future<Map<String, dynamic>> fetchNotificationPreferences() async {
+    final resp =
+        await _dio.get<Map<String, dynamic>>('/api/v1/push/preferences');
+    _ensureOk(resp);
+    return resp.data!;
+  }
+
+  /// Update notification preferences. PATCH semantics — pass only
+  /// fields the user actually changed; omit the rest.
+  Future<Map<String, dynamic>> updateNotificationPreferences(
+      Map<String, dynamic> partial) async {
+    final resp = await _dio.patch<Map<String, dynamic>>(
+      '/api/v1/push/preferences',
+      data: partial,
+    );
+    _ensureOk(resp);
+    return resp.data!;
+  }
+
   Future<void> registerPushToken({
     required String token,
     required String platform,
