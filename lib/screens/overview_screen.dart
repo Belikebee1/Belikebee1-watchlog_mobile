@@ -8,6 +8,7 @@ import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
+import '../utils/error_humanizer.dart';
 import '../widgets/skeleton.dart';
 import 'add_server_screen.dart';
 import 'settings_screen.dart';
@@ -268,7 +269,7 @@ class _CardError extends StatelessWidget {
                   )),
               const SizedBox(height: 2),
               Text(
-                _humanizeError(error),
+                humanize(error).title,
                 style: const TextStyle(color: AppColors.red, fontSize: 12),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -452,22 +453,3 @@ Color _severityColor(String severity) {
   }
 }
 
-String _humanizeError(Object error) {
-  final text = error.toString();
-  // Dio errors include a lot of stack-trace-like noise; trim aggressively.
-  if (text.contains('SocketException') || text.contains('Failed host lookup')) {
-    return 'Cannot reach server';
-  }
-  if (text.contains('401')) {
-    return 'Token revoked or expired — re-pair from settings';
-  }
-  if (text.contains('429')) {
-    return 'Too many requests';
-  }
-  if (text.contains('TimeoutException') || text.contains('timeout')) {
-    return 'Request timed out';
-  }
-  // Last resort: show the first line only, bounded.
-  final first = text.split('\n').first;
-  return first.length > 80 ? '${first.substring(0, 80)}…' : first;
-}

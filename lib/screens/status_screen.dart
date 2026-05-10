@@ -8,8 +8,10 @@ import '../providers/auth_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
 import '../providers/host_info_provider.dart';
+import '../utils/error_humanizer.dart';
 import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
+import '../widgets/error_view.dart';
 import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
@@ -69,7 +71,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       );
       _refresh();
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(shortMessage(e))));
     }
   }
 
@@ -112,7 +114,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       );
       _refresh();
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('Failed: $e')));
+      messenger.showSnackBar(SnackBar(content: Text(shortMessage(e))));
     }
   }
 
@@ -128,7 +130,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       _refresh();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: $e')),
+        SnackBar(content: Text(shortMessage(e))),
       );
     }
   }
@@ -145,7 +147,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       _refresh();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: $e')),
+        SnackBar(content: Text(shortMessage(e))),
       );
     }
   }
@@ -189,26 +191,22 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         onRefresh: () async => _refresh(),
         child: asyncCombined.when(
           loading: () => const _StatusSkeleton(),
-          error: (e, _) => ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              const SizedBox(height: 80),
-              const Icon(Icons.error_outline,
-                  color: AppColors.red, size: 48),
-              const SizedBox(height: 16),
-              Text(
-                'Failed to load: $e',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.fgMuted),
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _refresh,
-                  child: const Text('Retry'),
-                ),
-              ),
-            ],
+          error: (e, _) => ErrorView.from(
+            e,
+            onRetry: _refresh,
+            onSecondaryAction:
+                humanize(e).action == HumanErrorAction.rePair
+                    ? () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsScreen(),
+                          ),
+                        )
+                    : null,
+            secondaryActionLabel:
+                humanize(e).action == HumanErrorAction.rePair
+                    ? 'Open settings'
+                    : null,
           ),
           data: (combined) =>
               _buildContent(combined.status, combined.state),
