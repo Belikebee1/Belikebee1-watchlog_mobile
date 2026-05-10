@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/strings.dart';
 import '../models/notification_prefs.dart';
 import '../providers/auth_provider.dart';
+import '../providers/check_info_provider.dart';
 import '../providers/notification_prefs_provider.dart';
 import '../theme.dart';
 import '../utils/error_humanizer.dart';
@@ -98,6 +99,7 @@ class _NotificationSettingsScreenState
               ref.invalidate(notificationPrefsProvider(widget.serverId)),
         ),
         data: (prefs) => _Body(
+          serverId: widget.serverId,
           prefs: prefs,
           busy: _busy,
           onPatch: _patch,
@@ -109,6 +111,7 @@ class _NotificationSettingsScreenState
 }
 
 class _Body extends StatelessWidget {
+  final String serverId;
   final NotificationPreferences prefs;
   final bool busy;
   final Future<void> Function(Map<String, dynamic>) onPatch;
@@ -119,6 +122,7 @@ class _Body extends StatelessWidget {
   }) onPickTime;
 
   const _Body({
+    required this.serverId,
     required this.prefs,
     required this.busy,
     required this.onPatch,
@@ -204,6 +208,23 @@ class _Body extends StatelessWidget {
                 TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
           ),
         ),
+        const Divider(),
+        _SectionHeader(tr(context, S.sectionPerCheck)),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text(
+            tr(context, S.perCheckHint),
+            style:
+                TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+          ),
+        ),
+        _PerCheckSection(
+          serverId: serverId,
+          disabledChecks: prefs.disabledChecks,
+          busy: busy,
+          onPatch: onPatch,
+        ),
+        const SizedBox(height: 24),
       ],
     );
   }
@@ -260,6 +281,85 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Lists every check the backend knows about and lets the user toggle
+/// whether to receive push notifications for it. Reads from the
+/// existing checksInfoProvider so labels are localized + cached.
+///
+/// Each toggle PATCHes the full disabled_checks list (additive or
+/// subtractive) — server stores the latest snapshot so it's a clean
+/// state-replacement edit per tap.
+class _PerCheckSection extends ConsumerWidget {
+  final String serverId;
+  final List<String> disabledChecks;
+  final bool busy;
+  final Future<void> Function(Map<String, dynamic>) onPatch;
+
+  const _PerCheckSection({
+    required this.serverId,
+    required this.disabledChecks,
+    required this.busy,
+    required this.onPatch,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncInfo = ref.watch(checksInfoProvider(serverId));
+    final locale = Localizations.localeOf(context);
+    return asyncInfo.when(
+      loading: () => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          tr(context, S.checksLoading),
+          style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (info) {
+        if (info == null || info.checks.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        final disabled = disabledChecks.toSet();
+        final names = info.checks.keys.toList()..sort();
+        return Column(
+          children: [
+            for (final name in names)
+              SwitchListTile(
+                value: !disabled.contains(name),
+                onChanged: busy
+                    ? null
+                    : (enabled) {
+                        final next = disabled.toSet();
+                        if (enabled) {
+                          next.remove(name);
+                        } else {
+                          next.add(name);
+                        }
+                        onPatch({'disabled_checks': next.toList()});
+                      },
+                title: Text(_friendlyTitle(info, name, locale)),
+                subtitle: Text(
+                  name,
+                  style: TextStyle(
+                    color: context.surfaces.fgMuted,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _friendlyTitle(dynamic info, String checkName, Locale locale) {
+    final exp = info.checks[checkName];
+    if (exp == null) return checkName;
+    final code = locale.languageCode.toLowerCase();
+    return (exp.title[code] ?? exp.title['en'] ?? checkName) as String;
+  }
 }
 
 class _PrefsSkeleton extends StatelessWidget {

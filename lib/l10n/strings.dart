@@ -494,6 +494,20 @@ class S {
     'pl':
         'Globalny próg — alerty poniżej nigdy nie wysyłają, niezależnie od cichych godzin.',
   };
+  static const sectionPerCheck = {
+    'en': 'Per-check muting',
+    'pl': 'Wyciszanie per check',
+  };
+  static const perCheckHint = {
+    'en':
+        'Toggle off any check you don\'t want push notifications about. If a run\'s only actionable checks are all muted, the device gets no push for it.',
+    'pl':
+        'Wyłącz checki o których nie chcesz dostawać powiadomień. Jeśli wszystkie aktywne checki w danym uruchomieniu są wyciszone, urządzenie nie dostanie pusha.',
+  };
+  static const checksLoading = {
+    'en': 'Loading checks…',
+    'pl': 'Wczytywanie checków…',
+  };
   static const prefsSavedSnack = {
     'en': 'Notification preferences saved',
     'pl': 'Zapisano ustawienia powiadomień',

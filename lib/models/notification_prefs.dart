@@ -17,6 +17,7 @@ class NotificationPreferences {
   final String? quietTimezone;
   final String quietMinSeverity;
   final String minSeverity;
+  final List<String> disabledChecks;
 
   const NotificationPreferences({
     required this.quietHoursEnabled,
@@ -25,6 +26,7 @@ class NotificationPreferences {
     required this.quietTimezone,
     required this.quietMinSeverity,
     required this.minSeverity,
+    required this.disabledChecks,
   });
 
   static const defaults = NotificationPreferences(
@@ -34,6 +36,7 @@ class NotificationPreferences {
     quietTimezone: null,
     quietMinSeverity: 'CRITICAL',
     minSeverity: 'WARN',
+    disabledChecks: [],
   );
 
   factory NotificationPreferences.fromJson(Map<String, dynamic> json) =>
@@ -46,6 +49,9 @@ class NotificationPreferences {
             (json['quiet_min_severity'] as String? ?? 'CRITICAL').toUpperCase(),
         minSeverity:
             (json['min_severity'] as String? ?? 'WARN').toUpperCase(),
+        disabledChecks: ((json['disabled_checks'] as List?) ?? const [])
+            .map((e) => e.toString())
+            .toList(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,6 +61,7 @@ class NotificationPreferences {
         if (quietTimezone != null) 'quiet_timezone': quietTimezone,
         'quiet_min_severity': quietMinSeverity,
         'min_severity': minSeverity,
+        'disabled_checks': disabledChecks,
       };
 
   NotificationPreferences copyWith({
@@ -64,6 +71,7 @@ class NotificationPreferences {
     String? quietTimezone,
     String? quietMinSeverity,
     String? minSeverity,
+    List<String>? disabledChecks,
   }) =>
       NotificationPreferences(
         quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
@@ -72,5 +80,6 @@ class NotificationPreferences {
         quietTimezone: quietTimezone ?? this.quietTimezone,
         quietMinSeverity: quietMinSeverity ?? this.quietMinSeverity,
         minSeverity: minSeverity ?? this.minSeverity,
+        disabledChecks: disabledChecks ?? this.disabledChecks,
       );
 }
