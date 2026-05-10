@@ -83,15 +83,15 @@ class CheckRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(data.title,
-                      style: const TextStyle(
-                          color: AppColors.fgMuted, fontSize: 13)),
+                      style: TextStyle(
+                          color: context.surfaces.fgMuted, fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 4,
                     children: [
-                      _smallBtn('Snooze 4h', onSnooze),
-                      _smallBtn('Ignore', onIgnore),
-                      _smallBtn('Clear', onClear),
+                      _smallBtn(context, 'Snooze 4h', onSnooze),
+                      _smallBtn(context, 'Ignore', onIgnore),
+                      _smallBtn(context, 'Clear', onClear),
                     ],
                   ),
                 ],
@@ -115,14 +115,15 @@ class CheckRow extends StatelessWidget {
                 color: color, fontSize: 10, fontWeight: FontWeight.w600)),
       );
 
-  Widget _smallBtn(String text, VoidCallback onPressed) => OutlinedButton(
+  Widget _smallBtn(BuildContext context, String text, VoidCallback onPressed) =>
+      OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           minimumSize: const Size(0, 28),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          side: const BorderSide(color: AppColors.border),
-          foregroundColor: AppColors.fgMuted,
+          side: BorderSide(color: context.surfaces.border),
+          foregroundColor: context.surfaces.fgMuted,
           textStyle: const TextStyle(fontSize: 12),
         ),
         child: Text(text),

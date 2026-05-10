@@ -119,19 +119,20 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                       style: TextStyle(fontSize: 56),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'watchlog',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.fg,
+                      color: context.surfaces.fg,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Add your first watchlog server.',
-                    style: TextStyle(color: AppColors.fgMuted, fontSize: 14),
+                    style: TextStyle(
+                        color: context.surfaces.fgMuted, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -152,7 +153,7 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                   'On the server run:  sudo watchlog api qr',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: AppColors.fgMuted.withValues(alpha: 0.9),
+                    color: context.surfaces.fgMuted.withValues(alpha: 0.9),
                     fontSize: 12,
                     fontFamily: 'monospace',
                   ),
@@ -160,19 +161,20 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    const Expanded(child: Divider(color: AppColors.border)),
+                    Expanded(child: Divider(color: context.surfaces.border)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
                         'OR',
                         style: TextStyle(
-                          color: AppColors.fgMuted.withValues(alpha: 0.7),
+                          color: context.surfaces.fgMuted
+                              .withValues(alpha: 0.7),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    const Expanded(child: Divider(color: AppColors.border)),
+                    Expanded(child: Divider(color: context.surfaces.border)),
                   ],
                 ),
                 const SizedBox(height: 8),

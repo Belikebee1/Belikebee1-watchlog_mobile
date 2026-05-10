@@ -251,7 +251,7 @@ class _PairScreenState extends ConsumerState<PairScreen> {
             'On the server, run:  sudo watchlog api qr',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: AppColors.fgMuted.withValues(alpha: 0.9),
+              color: context.surfaces.fgMuted.withValues(alpha: 0.9),
               fontSize: 12,
               fontFamily: 'monospace',
             ),
@@ -306,11 +306,11 @@ class _ManualPairFormState extends State<_ManualPairForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Run on the server:\nsudo watchlog api qr',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: AppColors.fgMuted,
+                color: context.surfaces.fgMuted,
                 fontFamily: 'monospace',
                 fontSize: 13,
               ),
@@ -356,11 +356,11 @@ class _ManualPairFormState extends State<_ManualPairForm> {
                         code: _codeController.text,
                       ),
               child: widget.busy
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 18,
                       width: 18,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppColors.bg))
+                          strokeWidth: 2, color: context.surfaces.bg))
                   : const Text('Pair'),
             ),
           ],
@@ -412,13 +412,13 @@ class _ScannerErrorView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.videocam_off,
-              size: 56, color: AppColors.fgMuted),
+          Icon(Icons.videocam_off,
+              size: 56, color: context.surfaces.fgMuted),
           const SizedBox(height: 16),
           Text(
             reason,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.fgMuted),
+            style: TextStyle(color: context.surfaces.fgMuted),
           ),
           const SizedBox(height: 24),
           ElevatedButton(

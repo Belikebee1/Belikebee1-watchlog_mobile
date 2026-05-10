@@ -54,7 +54,7 @@ class SettingsScreen extends ConsumerWidget {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  backgroundColor: AppColors.bgElevated,
+                  backgroundColor: ctx.surfaces.bgElevated,
                   title: const Text('Sign out of all servers?'),
                   content: const Text(
                       'This removes every server from this device. You will need to add them again to receive alerts.'),
@@ -84,12 +84,12 @@ class SettingsScreen extends ConsumerWidget {
           const _SectionHeader('Appearance'),
           const _AppearanceTile(),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.info_outline, color: AppColors.fgMuted),
-            title: Text('About'),
+          ListTile(
+            leading: Icon(Icons.info_outline, color: context.surfaces.fgMuted),
+            title: const Text('About'),
             subtitle: Text(
               'watchlog mobile · v0.1.0\nhttps://watchlog.pl',
-              style: TextStyle(color: AppColors.fgMuted),
+              style: TextStyle(color: context.surfaces.fgMuted),
             ),
           ),
         ],
@@ -107,8 +107,8 @@ class _SectionHeader extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
         child: Text(
           label.toUpperCase(),
-          style: const TextStyle(
-            color: AppColors.fgMuted,
+          style: TextStyle(
+            color: context.surfaces.fgMuted,
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -137,16 +137,16 @@ class _ServerTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         isActive ? Icons.radio_button_checked : Icons.radio_button_off,
-        color: isActive ? AppColors.accent : AppColors.fgMuted,
+        color: isActive ? AppColors.accent : context.surfaces.fgMuted,
       ),
       title: Text(server.name),
       subtitle: Text(
         server.baseUrl,
-        style: const TextStyle(color: AppColors.fgMuted, fontSize: 12),
+        style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
       ),
       onTap: isActive ? null : onSetActive,
       trailing: PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert, color: AppColors.fgMuted),
+        icon: Icon(Icons.more_vert, color: context.surfaces.fgMuted),
         onSelected: (value) async {
           if (value == 'rename') {
             final newName = await _promptRename(context, server.name);
@@ -157,7 +157,7 @@ class _ServerTile extends StatelessWidget {
             final confirm = await showDialog<bool>(
               context: context,
               builder: (ctx) => AlertDialog(
-                backgroundColor: AppColors.bgElevated,
+                backgroundColor: ctx.surfaces.bgElevated,
                 title: Text('Remove ${server.name}?'),
                 content: const Text(
                     'This stops alerts from this server on this device.'),
@@ -195,7 +195,7 @@ class _ServerTile extends StatelessWidget {
     return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgElevated,
+        backgroundColor: ctx.surfaces.bgElevated,
         title: const Text('Rename server'),
         content: TextField(
           controller: controller,

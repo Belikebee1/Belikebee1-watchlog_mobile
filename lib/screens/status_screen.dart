@@ -81,7 +81,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgElevated,
+        backgroundColor: ctx.surfaces.bgElevated,
         title: const Text('Apply security updates?'),
         content: const Text(
           'This will run `unattended-upgrade -v` on the server. '
@@ -280,8 +280,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                 icon: const Icon(Icons.refresh),
                 label: const Text('Run now'),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.border),
-                  foregroundColor: AppColors.fg,
+                  side: BorderSide(color: context.surfaces.border),
+                  foregroundColor: context.surfaces.fg,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
@@ -296,14 +296,14 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                children: const [
-                  Text('✅', style: TextStyle(fontSize: 48)),
-                  SizedBox(height: 8),
+                children: [
+                  const Text('✅', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 8),
                   Text('All checks passing.',
-                      style: TextStyle(color: AppColors.fg)),
-                  SizedBox(height: 4),
+                      style: TextStyle(color: context.surfaces.fg)),
+                  const SizedBox(height: 4),
                   Text('Nothing to act on.',
-                      style: TextStyle(color: AppColors.fgMuted)),
+                      style: TextStyle(color: context.surfaces.fgMuted)),
                 ],
               ),
             ),
@@ -314,7 +314,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               children: [
                 for (var i = 0; i < rows.length; i++) ...[
                   if (i > 0)
-                    const Divider(height: 1, color: AppColors.border),
+                    Divider(height: 1, color: context.surfaces.border),
                   CheckRow(
                     data: rows[i],
                     onSnooze: () => _onSnooze(rows[i].check),
@@ -400,20 +400,20 @@ class _StatusSkeleton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.bgElevated,
+              color: context.surfaces.bgElevated,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.surfaces.border),
             ),
             child: Row(
-              children: const [
+              children: [
                 Icon(Icons.dns_outlined,
-                    size: 18, color: AppColors.fgMuted),
-                SizedBox(width: 8),
-                Skeleton(width: 100, height: 12),
-                SizedBox(width: 12),
-                Skeleton(width: 80, height: 12),
-                SizedBox(width: 12),
-                Skeleton(width: 60, height: 12),
+                    size: 18, color: context.surfaces.fgMuted),
+                const SizedBox(width: 8),
+                const Skeleton(width: 100, height: 12),
+                const SizedBox(width: 12),
+                const Skeleton(width: 80, height: 12),
+                const SizedBox(width: 12),
+                const Skeleton(width: 60, height: 12),
               ],
             ),
           ),
@@ -422,9 +422,9 @@ class _StatusSkeleton extends StatelessWidget {
           Container(
             height: 90,
             decoration: BoxDecoration(
-              color: AppColors.bgElevated,
+              color: context.surfaces.bgElevated,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.surfaces.border),
             ),
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -463,9 +463,9 @@ class _StatusSkeleton extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: AppColors.bgElevated,
+                color: context.surfaces.bgElevated,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.surfaces.border),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

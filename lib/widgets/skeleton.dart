@@ -71,7 +71,7 @@ class _SkeletonState extends State<Skeleton>
         // screens with many skeletons at once.
         final t = (controller.value * 2 - 1).abs();
         final alpha = 0.35 + 0.30 * t;
-        final color = AppColors.fgMuted.withValues(alpha: alpha * 0.4);
+        final color = context.surfaces.fgMuted.withValues(alpha: alpha * 0.4);
         return Container(
           margin: widget.margin,
           width: widget.width,

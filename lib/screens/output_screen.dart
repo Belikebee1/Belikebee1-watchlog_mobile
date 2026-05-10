@@ -60,7 +60,7 @@ class OutputScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text('exit ${result.exitCode}',
-                      style: const TextStyle(color: AppColors.fgMuted)),
+                      style: TextStyle(color: context.surfaces.fgMuted)),
                 ],
               ),
             ),
@@ -78,15 +78,15 @@ class OutputScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.codeBg,
+                  color: context.surfaces.codeBg,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.surfaces.border),
                 ),
                 child: SingleChildScrollView(
                   child: SelectableText(
                     result.output.isEmpty ? '(no output)' : result.output,
-                    style: const TextStyle(
-                      color: AppColors.fg,
+                    style: TextStyle(
+                      color: context.surfaces.fg,
                       fontFamily: 'monospace',
                       fontSize: 12,
                       height: 1.4,

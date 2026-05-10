@@ -63,8 +63,8 @@ class _ErrorViewState extends State<ErrorView> {
         Text(
           widget.error.title,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.fg,
+          style: TextStyle(
+            color: context.surfaces.fg,
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -73,8 +73,8 @@ class _ErrorViewState extends State<ErrorView> {
         Text(
           widget.error.body,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.fgMuted,
+          style: TextStyle(
+            color: context.surfaces.fgMuted,
             fontSize: 14,
             height: 1.4,
           ),
@@ -104,11 +104,11 @@ class _ErrorViewState extends State<ErrorView> {
             icon: Icon(
               _showDetails ? Icons.expand_less : Icons.expand_more,
               size: 18,
-              color: AppColors.fgMuted,
+              color: context.surfaces.fgMuted,
             ),
             label: Text(
               _showDetails ? 'Hide details' : 'Show details',
-              style: const TextStyle(color: AppColors.fgMuted),
+              style: TextStyle(color: context.surfaces.fgMuted),
             ),
           ),
         ),
@@ -117,9 +117,9 @@ class _ErrorViewState extends State<ErrorView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.bgElevated,
+              color: context.surfaces.bgElevated,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: context.surfaces.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,10 +127,10 @@ class _ErrorViewState extends State<ErrorView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Raw error',
                       style: TextStyle(
-                        color: AppColors.fgMuted,
+                        color: context.surfaces.fgMuted,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -148,12 +148,12 @@ class _ErrorViewState extends State<ErrorView> {
                           ),
                         );
                       },
-                      child: const Padding(
-                        padding: EdgeInsets.all(4),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
                         child: Icon(
                           Icons.copy,
                           size: 14,
-                          color: AppColors.fgMuted,
+                          color: context.surfaces.fgMuted,
                         ),
                       ),
                     ),
@@ -162,8 +162,8 @@ class _ErrorViewState extends State<ErrorView> {
                 const SizedBox(height: 6),
                 SelectableText(
                   widget.error.rawDetails,
-                  style: const TextStyle(
-                    color: AppColors.fg,
+                  style: TextStyle(
+                    color: context.surfaces.fg,
                     fontSize: 11,
                     fontFamily: 'monospace',
                     height: 1.4,

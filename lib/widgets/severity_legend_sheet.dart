@@ -16,7 +16,7 @@ class SeverityLegendSheet extends ConsumerWidget {
   static Future<void> show(BuildContext context, {required String serverId}) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.bgElevated,
+      backgroundColor: context.surfaces.bgElevated,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -46,7 +46,7 @@ class SeverityLegendSheet extends ConsumerWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.fgMuted.withValues(alpha: 0.3),
+                  color: context.surfaces.fgMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -54,10 +54,10 @@ class SeverityLegendSheet extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               localizedText(_kHeading, locale),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.fg,
+                color: context.surfaces.fg,
               ),
             ),
             const SizedBox(height: 16),
@@ -126,8 +126,8 @@ class _LegendRow extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             localizedText(entry.description, locale),
-            style: const TextStyle(
-              color: AppColors.fg,
+            style: TextStyle(
+              color: context.surfaces.fg,
               fontSize: 13,
               height: 1.4,
             ),

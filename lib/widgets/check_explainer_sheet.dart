@@ -41,7 +41,7 @@ class CheckExplainerSheet extends ConsumerWidget {
   }) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.bgElevated,
+      backgroundColor: context.surfaces.bgElevated,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -79,7 +79,7 @@ class CheckExplainerSheet extends ConsumerWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.fgMuted.withValues(alpha: 0.3),
+                    color: context.surfaces.fgMuted.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -149,10 +149,10 @@ class _Header extends StatelessWidget {
             children: [
               Text(
                 friendlyTitle ?? data.check,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.fg,
+                  color: context.surfaces.fg,
                 ),
               ),
               const SizedBox(height: 2),
@@ -160,7 +160,7 @@ class _Header extends StatelessWidget {
                 data.check,
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.fgMuted.withValues(alpha: 0.8),
+                  color: context.surfaces.fgMuted.withValues(alpha: 0.8),
                   fontFamily: 'monospace',
                 ),
               ),
@@ -274,7 +274,7 @@ class _Section extends StatelessWidget {
           body,
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.fg,
+            color: context.surfaces.fg,
             height: 1.4,
             fontFamily: monospace ? 'monospace' : null,
           ),
@@ -416,10 +416,11 @@ class _ExplainerSkeleton extends StatelessWidget {
         children: [
           for (var i = 0; i < 3; i++) ...[
             Row(
-              children: const [
-                Icon(Icons.circle, size: 12, color: AppColors.fgMuted),
-                SizedBox(width: 6),
-                Skeleton(width: 80, height: 11),
+              children: [
+                Icon(Icons.circle,
+                    size: 12, color: context.surfaces.fgMuted),
+                const SizedBox(width: 6),
+                const Skeleton(width: 80, height: 11),
               ],
             ),
             const SizedBox(height: 6),

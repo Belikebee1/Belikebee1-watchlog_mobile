@@ -119,20 +119,20 @@ class _EmptyServers extends StatelessWidget {
         const SizedBox(height: 80),
         const Center(child: Text('👁️', style: TextStyle(fontSize: 64))),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'No servers yet',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.fg,
+            color: context.surfaces.fg,
             fontSize: 20,
             fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Pair your first watchlog server to see its health here.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.fgMuted),
+          style: TextStyle(color: context.surfaces.fgMuted),
         ),
         const SizedBox(height: 24),
         Center(
@@ -168,9 +168,9 @@ class _ServerCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.bgElevated,
+          color: context.surfaces.bgElevated,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.surfaces.border),
         ),
         child: asyncSnapshot.when(
           loading: () => _CardLoading(server: server),
@@ -213,8 +213,8 @@ class _CardLoading extends StatelessWidget {
                   children: [
                     Text(
                       server.name,
-                      style: const TextStyle(
-                        color: AppColors.fg,
+                      style: TextStyle(
+                        color: context.surfaces.fg,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       ),
@@ -255,15 +255,15 @@ class _CardError extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.error_outline, color: AppColors.red, size: 22),
+        const Icon(Icons.error_outline, color: AppColors.red, size: 22),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(server.name,
-                  style: const TextStyle(
-                    color: AppColors.fg,
+                  style: TextStyle(
+                    color: context.surfaces.fg,
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
                   )),
@@ -277,7 +277,7 @@ class _CardError extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 server.baseUrl,
-                style: const TextStyle(color: AppColors.fgMuted, fontSize: 11),
+                style: TextStyle(color: context.surfaces.fgMuted, fontSize: 11),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -335,8 +335,8 @@ class _CardLoaded extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(server.name,
-                      style: const TextStyle(
-                        color: AppColors.fg,
+                      style: TextStyle(
+                        color: context.surfaces.fg,
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
                       )),
@@ -351,8 +351,8 @@ class _CardLoaded extends StatelessWidget {
             if (age != null)
               Text(
                 _ageString(age),
-                style: const TextStyle(
-                    color: AppColors.fgMuted, fontSize: 11),
+                style: TextStyle(
+                    color: context.surfaces.fgMuted, fontSize: 11),
               ),
           ],
         ),
@@ -391,18 +391,18 @@ class _CountsStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _chip('OK', counts['OK'] ?? 0, AppColors.green),
+        _chip(context, 'OK', counts['OK'] ?? 0, AppColors.green),
         const SizedBox(width: 6),
-        _chip('INFO', counts['INFO'] ?? 0, AppColors.accent),
+        _chip(context, 'INFO', counts['INFO'] ?? 0, AppColors.accent),
         const SizedBox(width: 6),
-        _chip('WARN', counts['WARN'] ?? 0, AppColors.yellow),
+        _chip(context, 'WARN', counts['WARN'] ?? 0, AppColors.yellow),
         const SizedBox(width: 6),
-        _chip('CRIT', counts['CRITICAL'] ?? 0, AppColors.red),
+        _chip(context, 'CRIT', counts['CRITICAL'] ?? 0, AppColors.red),
       ],
     );
   }
 
-  Widget _chip(String label, int count, Color color) {
+  Widget _chip(BuildContext context, String label, int count, Color color) {
     final dim = count == 0;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -411,7 +411,7 @@ class _CountsStrip extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: dim
-              ? AppColors.border
+              ? context.surfaces.border
               : color.withValues(alpha: 0.4),
         ),
       ),
@@ -421,7 +421,7 @@ class _CountsStrip extends StatelessWidget {
           Text(
             '$count',
             style: TextStyle(
-              color: dim ? AppColors.fgMuted : color,
+              color: dim ? context.surfaces.fgMuted : color,
               fontWeight: FontWeight.w700,
               fontSize: 12,
             ),
@@ -430,7 +430,8 @@ class _CountsStrip extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: dim ? AppColors.fgMuted : color.withValues(alpha: 0.8),
+              color:
+                  dim ? context.surfaces.fgMuted : color.withValues(alpha: 0.8),
               fontSize: 10,
             ),
           ),
@@ -452,4 +453,3 @@ Color _severityColor(String severity) {
       return AppColors.green;
   }
 }
-

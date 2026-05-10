@@ -6,7 +6,8 @@ import '../theme.dart';
 class SeverityBanner extends StatelessWidget {
   final Status? status;
   final VoidCallback onRefresh;
-  const SeverityBanner({super.key, required this.status, required this.onRefresh});
+  const SeverityBanner(
+      {super.key, required this.status, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +16,9 @@ class SeverityBanner extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
-            children: const [
-              Text('⏳', style: TextStyle(fontSize: 32)),
-              SizedBox(width: 16),
+            children: [
+              const Text('⏳', style: TextStyle(fontSize: 32)),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,12 +27,12 @@ class SeverityBanner extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.fg)),
-                    SizedBox(height: 4),
+                            color: context.surfaces.fg)),
+                    const SizedBox(height: 4),
                     Text(
                       'Run watchlog at least once on the server.',
-                      style:
-                          TextStyle(color: AppColors.fgMuted, fontSize: 13),
+                      style: TextStyle(
+                          color: context.surfaces.fgMuted, fontSize: 13),
                     ),
                   ],
                 ),
@@ -70,21 +71,21 @@ class SeverityBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.fg)),
+                          color: context.surfaces.fg)),
                   const SizedBox(height: 4),
                   Text(
                     '${s.host} · v${s.watchlogVersion} · $ageStr',
-                    style: const TextStyle(
-                        color: AppColors.fgMuted, fontSize: 12),
+                    style: TextStyle(
+                        color: context.surfaces.fgMuted, fontSize: 12),
                   ),
                 ],
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.refresh, color: AppColors.fgMuted),
+              icon: Icon(Icons.refresh, color: context.surfaces.fgMuted),
               onPressed: onRefresh,
               tooltip: 'Refresh',
             ),

@@ -42,21 +42,22 @@ class _HeaderSkeleton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.bgElevated,
+          color: context.surfaces.bgElevated,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.surfaces.border),
         ),
         child: Row(
-          children: const [
-            Icon(Icons.dns_outlined, size: 18, color: AppColors.fgMuted),
-            SizedBox(width: 8),
-            Skeleton(width: 100, height: 12),
-            SizedBox(width: 12),
-            Skeleton(width: 80, height: 12),
-            SizedBox(width: 12),
-            Skeleton(width: 60, height: 12),
-            Spacer(),
-            Icon(Icons.chevron_right, size: 18, color: AppColors.fgMuted),
+          children: [
+            Icon(Icons.dns_outlined, size: 18, color: context.surfaces.fgMuted),
+            const SizedBox(width: 8),
+            const Skeleton(width: 100, height: 12),
+            const SizedBox(width: 12),
+            const Skeleton(width: 80, height: 12),
+            const SizedBox(width: 12),
+            const Skeleton(width: 60, height: 12),
+            const Spacer(),
+            Icon(Icons.chevron_right,
+                size: 18, color: context.surfaces.fgMuted),
           ],
         ),
       ),
@@ -80,14 +81,14 @@ class _CompactStrip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.bgElevated,
+          color: context.surfaces.bgElevated,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.surfaces.border),
         ),
         child: Row(
           children: [
-            const Icon(Icons.dns_outlined,
-                size: 18, color: AppColors.fgMuted),
+            Icon(Icons.dns_outlined,
+                size: 18, color: context.surfaces.fgMuted),
             const SizedBox(width: 8),
             Expanded(
               child: Wrap(
@@ -95,8 +96,7 @@ class _CompactStrip extends StatelessWidget {
                 runSpacing: 4,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  if (osLabel != null)
-                    _ChipText(text: osLabel, icon: null),
+                  if (osLabel != null) _ChipText(text: osLabel, icon: null),
                   if (info.kernel != null)
                     _ChipText(
                       text: info.kernel!,
@@ -115,8 +115,8 @@ class _CompactStrip extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right,
-                size: 18, color: AppColors.fgMuted),
+            Icon(Icons.chevron_right,
+                size: 18, color: context.surfaces.fgMuted),
           ],
         ),
       ),
@@ -153,14 +153,14 @@ class _ChipText extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 13, color: AppColors.fgMuted),
+          Icon(icon, size: 13, color: context.surfaces.fgMuted),
           const SizedBox(width: 4),
         ],
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(
-              color: AppColors.fg,
+            style: TextStyle(
+              color: context.surfaces.fg,
               fontSize: 12,
               fontFamily: 'monospace',
             ),
@@ -182,7 +182,7 @@ class _HostInfoSheet extends StatelessWidget {
   static Future<void> show(BuildContext context, {required HostInfo info}) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.bgElevated,
+      backgroundColor: context.surfaces.bgElevated,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -205,7 +205,7 @@ class _HostInfoSheet extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.fgMuted.withValues(alpha: 0.3),
+                  color: context.surfaces.fgMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -213,8 +213,8 @@ class _HostInfoSheet extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               info.fqdn ?? info.hostname,
-              style: const TextStyle(
-                color: AppColors.fg,
+              style: TextStyle(
+                color: context.surfaces.fg,
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
               ),
@@ -222,8 +222,8 @@ class _HostInfoSheet extends StatelessWidget {
             if (info.fqdn != null && info.fqdn != info.hostname)
               Text(
                 info.hostname,
-                style: const TextStyle(
-                  color: AppColors.fgMuted,
+                style: TextStyle(
+                  color: context.surfaces.fgMuted,
                   fontSize: 12,
                   fontFamily: 'monospace',
                 ),
@@ -326,8 +326,8 @@ class _DetailRow extends StatelessWidget {
             width: 130,
             child: Text(
               label,
-              style: const TextStyle(
-                color: AppColors.fgMuted,
+              style: TextStyle(
+                color: context.surfaces.fgMuted,
                 fontSize: 13,
               ),
             ),
@@ -336,7 +336,7 @@ class _DetailRow extends StatelessWidget {
             child: SelectableText(
               value,
               style: TextStyle(
-                color: AppColors.fg,
+                color: context.surfaces.fg,
                 fontSize: 13,
                 fontFamily: monospace ? 'monospace' : null,
               ),
