@@ -76,9 +76,9 @@ class _AddServerScreenState extends ConsumerState<AddServerScreen> {
         await ref.read(pushServiceProvider).onServerAdded(server);
       } catch (_) {}
       if (!mounted) return;
-      if (!widget.isFirstRun) {
-        Navigator.of(context).pop();
-      }
+      // Same rationale as PairScreen: we may be reached from settings or
+      // from the first-run flow. Always settle on the home route.
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } on DioException catch (e) {
       setState(() {
         _error = 'Network error: ${e.message ?? e.type.name}';

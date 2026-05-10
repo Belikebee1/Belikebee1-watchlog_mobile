@@ -11,12 +11,17 @@ import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
-import 'add_server_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
 
+/// Per-server detail screen: full check list, action buttons, and the
+/// snooze/ignore actions. Pushed from [OverviewScreen] when the user taps
+/// a server card. The server is identified explicitly by [serverId] so
+/// this screen renders the right host even if the user changes the
+/// "active" server elsewhere mid-session.
 class StatusScreen extends ConsumerStatefulWidget {
-  const StatusScreen({super.key});
+  final String serverId;
+  const StatusScreen({super.key, required this.serverId});
   @override
   ConsumerState<StatusScreen> createState() => _StatusScreenState();
 }
@@ -37,11 +42,11 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   void _refresh() {
-    ref.invalidate(statusProvider);
+    ref.invalidate(serverStatusProvider(widget.serverId));
   }
 
   Future<void> _runWatchlog() async {
-    final api = ref.read(apiProvider);
+    final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(const SnackBar(content: Text('Running watchlog…')));
@@ -62,7 +67,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   Future<void> _applySecurity() async {
-    final api = ref.read(apiProvider);
+    final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     final confirm = await showDialog<bool>(
       context: context,
@@ -105,7 +110,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   Future<void> _onSnooze(String check) async {
-    final api = ref.read(apiProvider);
+    final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     try {
       await api.snooze(check, 4);
@@ -122,7 +127,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   Future<void> _onIgnore(String check) async {
-    final api = ref.read(apiProvider);
+    final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     try {
       await api.ignore(check);
@@ -139,7 +144,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   }
 
   Future<void> _onClear(String check) async {
-    final api = ref.read(apiProvider);
+    final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
     try {
       await api.unsnooze(check);
@@ -154,27 +159,14 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncCombined = ref.watch(statusProvider);
-    final servers = ref.watch(serversProvider);
-    final active = servers.active;
+    final asyncCombined = ref.watch(serverStatusProvider(widget.serverId));
+    final server = ref.watch(serverByIdProvider(widget.serverId));
 
     return Scaffold(
       appBar: AppBar(
-        title: _ServerSwitcher(
-          servers: servers.servers.map((s) => (id: s.id, name: s.name)).toList(),
-          activeId: active?.id,
-          activeName: active?.name ?? 'watchlog',
-          onSelect: (id) async {
-            await ref.read(serversProvider.notifier).setActive(id);
-            ref.invalidate(statusProvider);
-          },
-          onAdd: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AddServerScreen()),
-            );
-            ref.invalidate(statusProvider);
-          },
+        title: Text(
+          server?.name ?? 'watchlog',
+          overflow: TextOverflow.ellipsis,
         ),
         actions: [
           IconButton(
@@ -323,6 +315,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                     onClear: () => _onClear(rows[i].check),
                     onTap: () => CheckExplainerSheet.show(
                       context,
+                      serverId: widget.serverId,
                       data: rows[i],
                       onSnooze: () => _onSnooze(rows[i].check),
                       onIgnore: () => _onIgnore(rows[i].check),
@@ -340,7 +333,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   Widget _countsRow(Status s) {
     final c = s.counts;
     return InkWell(
-      onTap: () => SeverityLegendSheet.show(context),
+      onTap: () => SeverityLegendSheet.show(context, serverId: widget.serverId),
       borderRadius: BorderRadius.circular(8),
       child: Row(
         children: [
@@ -383,86 +376,3 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       );
 }
 
-/// App-bar title that doubles as a server picker. Tap → menu listing every
-/// configured server plus "Add server…". A single-server install renders as
-/// a plain title (no menu).
-class _ServerSwitcher extends StatelessWidget {
-  final List<({String id, String name})> servers;
-  final String? activeId;
-  final String activeName;
-  final ValueChanged<String> onSelect;
-  final VoidCallback onAdd;
-
-  const _ServerSwitcher({
-    required this.servers,
-    required this.activeId,
-    required this.activeName,
-    required this.onSelect,
-    required this.onAdd,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final hasMultiple = servers.length > 1;
-    return PopupMenuButton<String>(
-      tooltip: 'Switch server',
-      onSelected: (value) {
-        if (value == '__add__') {
-          onAdd();
-        } else {
-          onSelect(value);
-        }
-      },
-      itemBuilder: (ctx) => [
-        for (final s in servers)
-          PopupMenuItem<String>(
-            value: s.id,
-            child: Row(
-              children: [
-                Icon(
-                  s.id == activeId
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  size: 18,
-                  color: s.id == activeId
-                      ? AppColors.accent
-                      : AppColors.fgMuted,
-                ),
-                const SizedBox(width: 12),
-                Text(s.name),
-              ],
-            ),
-          ),
-        const PopupMenuDivider(),
-        const PopupMenuItem<String>(
-          value: '__add__',
-          child: Row(
-            children: [
-              Icon(Icons.add, size: 18, color: AppColors.fgMuted),
-              SizedBox(width: 12),
-              Text('Add server…'),
-            ],
-          ),
-        ),
-      ],
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('👁️  ', style: TextStyle(fontSize: 18)),
-          Flexible(
-            child: Text(
-              activeName,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          if (hasMultiple)
-            const Icon(Icons.arrow_drop_down, color: AppColors.fgMuted),
-        ],
-      ),
-    );
-  }
-}

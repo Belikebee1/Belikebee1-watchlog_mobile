@@ -6,7 +6,7 @@ import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/push_provider.dart';
 import 'screens/add_server_screen.dart';
-import 'screens/status_screen.dart';
+import 'screens/overview_screen.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -61,7 +61,7 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
       home: !_bootstrapped
           ? const _Splash()
           : auth.isAuthenticated
-              ? const StatusScreen()
+              ? const OverviewScreen()
               : const AddServerScreen(isFirstRun: true),
     );
   }

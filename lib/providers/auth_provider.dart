@@ -193,8 +193,34 @@ final serversProvider =
 final authProvider = serversProvider;
 
 /// API client for the currently active server. Null if no servers configured.
+/// Kept for code paths that operate on whichever server happens to be
+/// "current" (push registration legacy, ad-hoc utilities). New screens
+/// should prefer [serverApiProvider] with an explicit server id so they
+/// can render any server, not just the active one.
 final apiProvider = Provider<WatchlogApi?>((ref) {
   final s = ref.watch(serversProvider).active;
   if (s == null) return null;
   return WatchlogApi(baseUrl: s.baseUrl, token: s.token);
+});
+
+/// API client scoped to a specific server id. Returns null if that id no
+/// longer exists in the registry (server was removed mid-flow).
+final serverApiProvider = Provider.family<WatchlogApi?, String>((ref, serverId) {
+  final servers = ref.watch(serversProvider).servers;
+  for (final s in servers) {
+    if (s.id == serverId) {
+      return WatchlogApi(baseUrl: s.baseUrl, token: s.token);
+    }
+  }
+  return null;
+});
+
+/// Look up a [Server] by id. Watching this rebuilds when the server's
+/// label changes (rename), so screens stay in sync.
+final serverByIdProvider = Provider.family<Server?, String>((ref, serverId) {
+  final servers = ref.watch(serversProvider).servers;
+  for (final s in servers) {
+    if (s.id == serverId) return s;
+  }
+  return null;
 });

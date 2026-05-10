@@ -10,9 +10,10 @@ import '../theme.dart';
 /// alert behavior, but a hardcoded fallback ships with the app so the
 /// legend works even when the server is unreachable.
 class SeverityLegendSheet extends ConsumerWidget {
-  const SeverityLegendSheet({super.key});
+  final String serverId;
+  const SeverityLegendSheet({super.key, required this.serverId});
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {required String serverId}) {
     return showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.bgElevated,
@@ -20,13 +21,13 @@ class SeverityLegendSheet extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (_) => const SeverityLegendSheet(),
+      builder: (_) => SeverityLegendSheet(serverId: serverId),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncInfo = ref.watch(checksInfoProvider);
+    final asyncInfo = ref.watch(checksInfoProvider(serverId));
     final locale = Localizations.localeOf(context);
     final entries = asyncInfo.maybeWhen(
       data: (info) => info?.severity ?? _fallback,

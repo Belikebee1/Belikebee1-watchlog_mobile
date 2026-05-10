@@ -111,11 +111,15 @@ class _PairScreenState extends ConsumerState<PairScreen> {
         await ref.read(pushServiceProvider).onServerAdded(server);
       } catch (_) {}
       if (!mounted) return;
-      // Always pop: PairScreen is pushed *on top* of the home (whether
-      // first-run AddServerScreen or a settings flow). After addServer
-      // succeeds, MaterialApp rebuilds with StatusScreen as home, but
-      // PairScreen remains on the stack until we explicitly pop it.
-      Navigator.of(context).pop();
+      // Pop all the way back to the home route. We may be sitting on
+      // {Home, Settings, AddServerScreen, PairScreen} or
+      // {AddServerScreen(first-run), PairScreen} — in either case,
+      // landing on the overview after a successful pair is correct.
+      // popUntil(isFirst) is also safe when MaterialApp's home has just
+      // swapped from AddServerScreen → OverviewScreen because of the
+      // state change: the Navigator's first route is whichever widget
+      // is currently rendered as MaterialApp.home.
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } on DioException catch (e) {
       setState(() {
         _error = 'Network error: ${e.message ?? e.type.name}';

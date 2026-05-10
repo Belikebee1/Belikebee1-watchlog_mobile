@@ -15,6 +15,7 @@ import '../widgets/check_row.dart';
 /// Action buttons (Snooze / Ignore / Clear) are surfaced here too so the
 /// user doesn't have to dismiss the sheet to act on the alert.
 class CheckExplainerSheet extends ConsumerWidget {
+  final String serverId;
   final CheckRowData data;
   final VoidCallback? onSnooze;
   final VoidCallback? onIgnore;
@@ -22,6 +23,7 @@ class CheckExplainerSheet extends ConsumerWidget {
 
   const CheckExplainerSheet({
     super.key,
+    required this.serverId,
     required this.data,
     this.onSnooze,
     this.onIgnore,
@@ -30,6 +32,7 @@ class CheckExplainerSheet extends ConsumerWidget {
 
   static Future<void> show(
     BuildContext context, {
+    required String serverId,
     required CheckRowData data,
     VoidCallback? onSnooze,
     VoidCallback? onIgnore,
@@ -43,6 +46,7 @@ class CheckExplainerSheet extends ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) => CheckExplainerSheet(
+        serverId: serverId,
         data: data,
         onSnooze: onSnooze,
         onIgnore: onIgnore,
@@ -53,7 +57,7 @@ class CheckExplainerSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncInfo = ref.watch(checksInfoProvider);
+    final asyncInfo = ref.watch(checksInfoProvider(serverId));
     final locale = Localizations.localeOf(context);
 
     return DraggableScrollableSheet(
