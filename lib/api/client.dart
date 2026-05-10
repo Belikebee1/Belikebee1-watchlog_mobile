@@ -176,6 +176,25 @@ class WatchlogApi {
     return resp.data!;
   }
 
+  /// List the last ~90 days of archived runs as one-line summaries.
+  /// Each entry includes the worst severity seen that day so the
+  /// mobile history browser can color-code the calendar without
+  /// fetching every day individually.
+  Future<Map<String, dynamic>> listReports() async {
+    final resp = await _dio.get<Map<String, dynamic>>('/api/v1/reports');
+    _ensureOk(resp);
+    return resp.data!;
+  }
+
+  /// Full archive of every run for a single day (YYYY-MM-DD). Returns
+  /// a list of {ran_at, results} objects in chronological order.
+  Future<List<dynamic>> fetchReportForDay(String date) async {
+    final resp = await _dio.get<dynamic>('/api/v1/reports/$date');
+    _ensureOk(resp);
+    final data = resp.data;
+    return data is List ? data : [];
+  }
+
   /// Fetch the notification preferences associated with this device's
   /// API token. The server identifies the calling token from the
   /// Bearer header.

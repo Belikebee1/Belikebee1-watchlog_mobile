@@ -349,6 +349,33 @@ class S {
     'pl': 'Skopiuj wynik',
   };
 
+  // ----- History browser (Phase 2C) -----
+  static const historyTitle = {'en': 'History', 'pl': 'Historia'};
+  static const historyTooltip = {
+    'en': 'Open history',
+    'pl': 'Otwórz historię',
+  };
+  static const noHistory = {
+    'en': 'No archived runs yet',
+    'pl': 'Brak zarchiwizowanych uruchomień',
+  };
+  static const noHistoryHint = {
+    'en':
+        'Once watchlog has run a few times the daily archives will show up here.',
+    'pl':
+        'Gdy watchlog zrobi kilka uruchomień, dzienne archiwa pojawią się tutaj.',
+  };
+  static const runsCount = {'en': '{n} runs', 'pl': '{n} uruchomień'};
+  static const runsCountSingular = {
+    'en': '{n} run',
+    'pl': '{n} uruchomienie',
+  };
+  static const dayDetailTitle = {'en': '{date}', 'pl': '{date}'};
+  static const noRunsForDay = {
+    'en': 'No runs recorded for this day',
+    'pl': 'Brak uruchomień zapisanych na ten dzień',
+  };
+
   // ----- Live metrics (disk / memory tile) -----
   static const liveMetricsHeader = {
     'en': 'LIVE',

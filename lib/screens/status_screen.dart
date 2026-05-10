@@ -18,6 +18,7 @@ import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
 import '../widgets/skeleton.dart';
+import 'history_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
 
@@ -181,6 +182,16 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: tr(context, S.historyTooltip),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HistoryScreen(serverId: widget.serverId),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.push(
