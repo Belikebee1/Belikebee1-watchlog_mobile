@@ -349,6 +349,17 @@ class S {
     'pl': 'Skopiuj wynik',
   };
 
+  // ----- Live metrics (disk / memory tile) -----
+  static const liveMetricsHeader = {
+    'en': 'LIVE',
+    'pl': 'NA ŻYWO',
+  };
+  static const diskLabel = {'en': 'Disk', 'pl': 'Dysk'};
+  static const ramLabel2 = {'en': 'RAM', 'pl': 'RAM'};
+  static const usedShort = {'en': 'used', 'pl': 'zajęte'};
+  static const freeShort = {'en': 'free', 'pl': 'wolne'};
+  static const ofShort = {'en': 'of', 'pl': 'z'};
+
   // ----- Notification preferences (Phase 2E) -----
   static const notificationsMenu = {
     'en': 'Notifications…',

@@ -12,6 +12,11 @@ class Status {
   final List<Actionable> actionable;
   final int? ageSeconds;
 
+  /// Per-check structured numerics, keyed by check_name. Added in
+  /// status.json schema_version 2; older heartbeats return an empty
+  /// map and the live-metrics widget gracefully renders nothing.
+  final Map<String, dynamic> metrics;
+
   Status({
     required this.schemaVersion,
     required this.ranAt,
@@ -22,6 +27,7 @@ class Status {
     required this.counts,
     required this.actionable,
     this.ageSeconds,
+    this.metrics = const {},
   });
 
   factory Status.fromJson(Map<String, dynamic> json) => Status(
@@ -36,10 +42,18 @@ class Status {
             .map((e) => Actionable.fromJson(e as Map<String, dynamic>))
             .toList(),
         ageSeconds: json['age_seconds'] as int?,
+        metrics: (json['metrics'] as Map?)?.cast<String, dynamic>() ?? const {},
       );
 
   Duration get age => Duration(
       seconds: ageSeconds ?? DateTime.now().difference(ranAt.toUtc()).inSeconds);
+
+  /// Convenience accessor — returns the metrics dict for a specific
+  /// check, or null if that check didn't expose any.
+  Map<String, dynamic>? metricsFor(String checkName) {
+    final raw = metrics[checkName];
+    return raw is Map ? raw.cast<String, dynamic>() : null;
+  }
 }
 
 class Actionable {

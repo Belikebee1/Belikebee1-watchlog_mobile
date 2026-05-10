@@ -13,6 +13,7 @@ import '../utils/error_humanizer.dart';
 import '../widgets/check_explainer_sheet.dart';
 import '../widgets/check_row.dart';
 import '../widgets/error_view.dart';
+import '../widgets/live_metrics_tile.dart';
 import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
@@ -261,6 +262,10 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       children: [
         ServerHeader(serverId: widget.serverId),
         const SizedBox(height: 12),
+        if (status != null) ...[
+          LiveMetricsTile(status: status),
+          const SizedBox(height: 12),
+        ],
         SeverityBanner(status: status, onRefresh: _refresh),
         const SizedBox(height: 16),
         Row(
