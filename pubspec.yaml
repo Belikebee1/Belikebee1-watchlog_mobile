@@ -26,8 +26,9 @@ dependencies:
   # Pull-to-refresh
   flutter_hooks: ^0.20.5
 
-  # Date formatting
-  intl: ^0.19.0
+  # Date formatting (pinned to match flutter_localizations transitive
+  # dependency from the SDK)
+  intl: ^0.20.2
 
   # Firebase / push notifications
   firebase_core: ^3.8.0
