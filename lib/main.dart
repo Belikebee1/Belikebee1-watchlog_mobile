@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/push_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/add_server_screen.dart';
 import 'screens/overview_screen.dart';
 import 'theme.dart';
@@ -42,6 +43,9 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
 
   Future<void> _bootstrap() async {
     await ref.read(authProvider.notifier).load();
+    // Theme mode persists across launches; loading runs in parallel with
+    // the auth load above. Both are local secure-storage reads — fast.
+    await ref.read(themeModeProvider.notifier).load();
     // Init push (may fail silently if Firebase not configured — that's OK)
     try {
       await ref.read(pushServiceProvider).initialize();
@@ -54,10 +58,13 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'watchlog',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
+      theme: buildLightTheme(),
+      darkTheme: buildDarkTheme(),
+      themeMode: themeMode,
       home: !_bootstrapped
           ? const _Splash()
           : auth.isAuthenticated

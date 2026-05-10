@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/push_provider.dart';
+import '../providers/theme_provider.dart';
 import '../theme.dart';
 import 'add_server_screen.dart';
 
@@ -79,6 +80,9 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          const Divider(),
+          const _SectionHeader('Appearance'),
+          const _AppearanceTile(),
           const Divider(),
           const ListTile(
             leading: Icon(Icons.info_outline, color: AppColors.fgMuted),
@@ -205,6 +209,61 @@ class _ServerTile extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
             child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Appearance" row — three-segment toggle: System / Light / Dark.
+///
+/// We use a SegmentedButton rather than a dialog/dropdown so the user
+/// sees all three options at once and can toggle with a single tap. The
+/// chosen mode persists in secure storage via [themeModeProvider].
+class _AppearanceTile extends ConsumerWidget {
+  const _AppearanceTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              'Theme',
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          SegmentedButton<ThemeMode>(
+            segments: const [
+              ButtonSegment(
+                value: ThemeMode.system,
+                label: Text('System'),
+                icon: Icon(Icons.brightness_auto_outlined),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                label: Text('Light'),
+                icon: Icon(Icons.light_mode_outlined),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                label: Text('Dark'),
+                icon: Icon(Icons.dark_mode_outlined),
+              ),
+            ],
+            selected: {mode},
+            showSelectedIcon: false,
+            onSelectionChanged: (set) {
+              if (set.isNotEmpty) {
+                ref.read(themeModeProvider.notifier).setMode(set.first);
+              }
+            },
           ),
         ],
       ),
