@@ -47,5 +47,7 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>watchlog uses the camera only to scan server pairing QR codes. Nothing is recorded or uploaded.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>watchlog uses Face ID to unlock the app and keep your server tokens private.</string>
 </dict>
 </plist>

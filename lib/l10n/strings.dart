@@ -470,6 +470,63 @@ class S {
     'pl': 'Brak uruchomień zapisanych na ten dzień',
   };
 
+  // ----- App lock (Phase 3O) -----
+  static const sectionSecurity = {
+    'en': 'Security',
+    'pl': 'Bezpieczeństwo',
+  };
+  static const biometricToggle = {
+    'en': 'Require biometric on launch',
+    'pl': 'Wymagaj biometrii przy starcie',
+  };
+  static const biometricHint = {
+    'en':
+        'Use Face ID / fingerprint / device PIN to unlock the app. Server tokens stay encrypted in the system keystore regardless of this setting.',
+    'pl':
+        'Użyj Face ID / odcisku palca / PIN-u urządzenia żeby odblokować aplikację. Tokeny serwerów są zaszyfrowane w systemowym keystore niezależnie od tej opcji.',
+  };
+  static const biometricUnavailable = {
+    'en': 'No biometric enrolled on this device',
+    'pl': 'Brak skonfigurowanej biometrii na tym urządzeniu',
+  };
+  static const autoLockLabel = {
+    'en': 'Auto-lock after',
+    'pl': 'Automatyczny zamek po',
+  };
+  static const autoLockImmediate = {'en': 'Immediately', 'pl': 'Natychmiast'};
+  static const autoLockMinutes = {'en': '{n} min', 'pl': '{n} min'};
+  static const autoLockNever = {'en': 'Never (session only)', 'pl': 'Nigdy (tylko sesja)'};
+  static const secureScreenToggle = {
+    'en': 'Hide app from screenshots',
+    'pl': 'Ukryj aplikację przed screenshotami',
+  };
+  static const secureScreenHint = {
+    'en':
+        'Prevents the OS task switcher and screenshot APIs from capturing watchlog content. Android only for now.',
+    'pl':
+        'Zapobiega przechwytywaniu zawartości watchlog przez task switcher i screenshoty. Na razie tylko Android.',
+  };
+  static const lockTitle = {
+    'en': 'watchlog locked',
+    'pl': 'watchlog zablokowany',
+  };
+  static const lockSubtitle = {
+    'en': 'Authenticate to unlock the dashboard.',
+    'pl': 'Uwierzytelnij się żeby odblokować dashboard.',
+  };
+  static const lockReason = {
+    'en': 'Unlock watchlog',
+    'pl': 'Odblokuj watchlog',
+  };
+  static const lockAuthenticate = {
+    'en': 'Authenticate',
+    'pl': 'Uwierzytelnij',
+  };
+  static const lockFailed = {
+    'en': 'Authentication failed',
+    'pl': 'Uwierzytelnianie nieudane',
+  };
+
   // ----- Live metrics (disk / memory tile) -----
   static const liveMetricsHeader = {
     'en': 'LIVE',

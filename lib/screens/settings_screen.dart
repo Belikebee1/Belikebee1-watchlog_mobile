@@ -5,6 +5,7 @@ import '../l10n/strings.dart';
 import '../models/server.dart';
 import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
+import '../providers/lock_provider.dart';
 import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
@@ -90,6 +91,9 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          const Divider(),
+          _SectionHeader(tr(context, S.sectionSecurity)),
+          const _SecurityTile(),
           const Divider(),
           _SectionHeader(tr(context, S.sectionAppearance)),
           const _AppearanceTile(),
@@ -336,6 +340,93 @@ class _LanguageTile extends ConsumerWidget {
           ref.read(localeProvider.notifier).setLocale(next);
         },
       ),
+    );
+  }
+}
+
+
+/// Per-device app lock controls. Wraps biometric_enabled toggle, the
+/// auto-lock timeout dropdown, and the secure-screen flag in one
+/// section so the user sees the relationship at a glance: turn off
+/// the master toggle and the rest grey out.
+class _SecurityTile extends ConsumerWidget {
+  const _SecurityTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lock = ref.watch(lockProvider);
+    final cfg = lock.config;
+    final available = lock.biometricAvailable;
+    final enabled = cfg.biometricEnabled && available;
+    return Column(
+      children: [
+        SwitchListTile(
+          title: Text(tr(context, S.biometricToggle)),
+          subtitle: available
+              ? null
+              : Text(
+                  tr(context, S.biometricUnavailable),
+                  style: TextStyle(color: context.surfaces.fgMuted),
+                ),
+          value: cfg.biometricEnabled,
+          onChanged: available
+              ? (v) => ref
+                  .read(lockProvider.notifier)
+                  .updateConfig(cfg.copyWith(biometricEnabled: v))
+              : null,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text(
+            tr(context, S.biometricHint),
+            style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+          ),
+        ),
+        ListTile(
+          enabled: enabled,
+          title: Text(tr(context, S.autoLockLabel)),
+          trailing: DropdownButton<int>(
+            value: cfg.autoLockMinutes,
+            onChanged: enabled
+                ? (v) {
+                    if (v != null) {
+                      ref
+                          .read(lockProvider.notifier)
+                          .updateConfig(cfg.copyWith(autoLockMinutes: v));
+                    }
+                  }
+                : null,
+            items: [
+              DropdownMenuItem(
+                value: 0,
+                child: Text(tr(context, S.autoLockImmediate)),
+              ),
+              for (final m in [1, 5, 15, 60])
+                DropdownMenuItem(
+                  value: m,
+                  child: Text(tr(context, S.autoLockMinutes, subs: {"n": "$m"})),
+                ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text(tr(context, S.autoLockNever)),
+              ),
+            ],
+          ),
+        ),
+        SwitchListTile(
+          title: Text(tr(context, S.secureScreenToggle)),
+          subtitle: Text(
+            tr(context, S.secureScreenHint),
+            style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+          ),
+          value: cfg.secureScreen,
+          onChanged: enabled
+              ? (v) => ref
+                  .read(lockProvider.notifier)
+                  .updateConfig(cfg.copyWith(secureScreen: v))
+              : null,
+        ),
+      ],
     );
   }
 }

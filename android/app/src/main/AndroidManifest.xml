@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Camera permission for QR-code-based server pairing. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!-- Biometric / device-credential authentication for the app lock. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <!-- Camera hardware is preferred but not required: device without a
          camera can still pair via the manual fallback (typed code). -->
     <uses-feature

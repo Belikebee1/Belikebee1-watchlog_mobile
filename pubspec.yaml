@@ -38,6 +38,11 @@ dependencies:
   # QR code scanner for pairing flow
   mobile_scanner: ^5.2.3
 
+  # Biometric authentication (Face ID / fingerprint / device PIN)
+  local_auth: ^2.3.0
+  local_auth_android: ^1.0.46
+  local_auth_darwin: ^1.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

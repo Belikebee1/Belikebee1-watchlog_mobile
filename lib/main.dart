@@ -6,11 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/lock_provider.dart';
 import 'providers/push_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/add_server_screen.dart';
 import 'screens/overview_screen.dart';
 import 'theme.dart';
+import 'widgets/app_lock_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +51,7 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
     // secure-storage reads — fast, run sequentially.
     await ref.read(themeModeProvider.notifier).load();
     await ref.read(localeProvider.notifier).load();
+    await ref.read(lockProvider.notifier).load();
     // Init push (may fail silently if Firebase not configured — that's OK)
     try {
       await ref.read(pushServiceProvider).initialize();
@@ -78,9 +81,11 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
       ],
       home: !_bootstrapped
           ? const _Splash()
-          : auth.isAuthenticated
-              ? const OverviewScreen()
-              : const AddServerScreen(isFirstRun: true),
+          : AppLockGate(
+              child: auth.isAuthenticated
+                  ? const OverviewScreen()
+                  : const AddServerScreen(isFirstRun: true),
+            ),
     );
   }
 }
