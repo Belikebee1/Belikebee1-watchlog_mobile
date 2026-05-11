@@ -10,6 +10,7 @@ import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
 import 'add_server_screen.dart';
+import 'backup_screen.dart';
 import 'notification_settings_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -90,6 +91,18 @@ class SettingsScreen extends ConsumerWidget {
                 if (context.mounted) Navigator.pop(context);
               }
             },
+          ),
+          const Divider(),
+          _SectionHeader(tr(context, S.sectionData)),
+          ListTile(
+            leading: Icon(Icons.cloud_sync_outlined,
+                color: context.surfaces.fgMuted),
+            title: Text(tr(context, S.dataMenu)),
+            trailing: Icon(Icons.chevron_right, color: context.surfaces.fgMuted),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BackupScreen()),
+            ),
           ),
           const Divider(),
           _SectionHeader(tr(context, S.sectionSecurity)),

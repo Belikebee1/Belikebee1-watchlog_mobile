@@ -470,6 +470,88 @@ class S {
     'pl': 'Brak uruchomień zapisanych na ten dzień',
   };
 
+  // ----- Backup / restore (Phase 3P) -----
+  static const sectionData = {'en': 'Data', 'pl': 'Dane'};
+  static const dataTitle = {
+    'en': 'Backup & restore',
+    'pl': 'Kopia zapasowa i odtworzenie',
+  };
+  static const dataMenu = {
+    'en': 'Backup & restore…',
+    'pl': 'Kopia i odtworzenie…',
+  };
+  static const dataHint = {
+    'en':
+        'Export your server list, tokens, and preferences to an encrypted file you can save to cloud storage or another phone. Restoring replaces the current state — pair tokens stay valid since the server identifies devices by token, not phone.',
+    'pl':
+        'Eksportuj listę serwerów, tokeny i ustawienia do zaszyfrowanego pliku, który możesz zapisać w chmurze lub na innym telefonie. Odtworzenie zastępuje aktualny stan — tokeny pozostają ważne, bo serwer identyfikuje urządzenia po tokenie, nie po telefonie.',
+  };
+  static const exportCta = {
+    'en': 'Export backup…',
+    'pl': 'Eksportuj kopię…',
+  };
+  static const importCta = {
+    'en': 'Import backup…',
+    'pl': 'Importuj kopię…',
+  };
+  static const exportEmpty = {
+    'en': 'No servers configured — nothing to export.',
+    'pl': 'Brak skonfigurowanych serwerów — nic do eksportu.',
+  };
+  static const exportPassphraseTitle = {
+    'en': 'Encrypt backup',
+    'pl': 'Zaszyfruj kopię',
+  };
+  static const exportPassphraseHint = {
+    'en':
+        'Pick a passphrase. You\'ll need this exact phrase to restore — write it down.',
+    'pl':
+        'Wybierz hasło. Będzie potrzebne dokładnie to samo hasło żeby odtworzyć — zapisz je.',
+  };
+  static const importPassphraseTitle = {
+    'en': 'Decrypt backup',
+    'pl': 'Odszyfruj kopię',
+  };
+  static const importPassphraseHint = {
+    'en': 'Enter the passphrase the backup was created with.',
+    'pl': 'Wprowadź hasło, którym kopia była zaszyfrowana.',
+  };
+  static const passphraseLabel = {
+    'en': 'Passphrase (min 8 chars)',
+    'pl': 'Hasło (min 8 znaków)',
+  };
+  static const passphraseRepeat = {
+    'en': 'Repeat passphrase',
+    'pl': 'Powtórz hasło',
+  };
+  static const passphraseTooShort = {
+    'en': 'Use at least 8 characters',
+    'pl': 'Użyj minimum 8 znaków',
+  };
+  static const passphraseMismatch = {
+    'en': 'Passphrases don\'t match',
+    'pl': 'Hasła nie pasują',
+  };
+  static const wrongPassphrase = {
+    'en': 'Wrong passphrase or corrupted file',
+    'pl': 'Niepoprawne hasło lub uszkodzony plik',
+  };
+  static const restoreConfirmTitle = {
+    'en': 'Restore from backup?',
+    'pl': 'Odtworzyć z kopii?',
+  };
+  static const restoreConfirmBody = {
+    'en':
+        'Imports {n} server(s) from {ts}. Your current server list will be replaced. Continue?',
+    'pl':
+        'Importuje {n} serwer(ów) z {ts}. Twoja aktualna lista zostanie zastąpiona. Kontynuować?',
+  };
+  static const restoreApply = {'en': 'Restore', 'pl': 'Odtwórz'};
+  static const restoreApplied = {
+    'en': 'Backup applied',
+    'pl': 'Kopia odtworzona',
+  };
+
   // ----- App lock (Phase 3O) -----
   static const sectionSecurity = {
     'en': 'Security',
