@@ -470,6 +470,91 @@ class S {
     'pl': 'Brak uruchomień zapisanych na ten dzień',
   };
 
+  // ----- Audit log (Phase 3Q) -----
+  static const auditMenu = {'en': 'Audit log…', 'pl': 'Dziennik akcji…'};
+  static const auditTitle = {'en': 'Audit log', 'pl': 'Dziennik akcji'};
+  static const auditEmpty = {
+    'en': 'No events yet',
+    'pl': 'Brak zdarzeń',
+  };
+  static const auditEmptyHint = {
+    'en':
+        'Pairing, restart, snooze, and similar actions show up here in real time.',
+    'pl':
+        'Pairing, restart, snooze i podobne akcje pojawiają się tu na żywo.',
+  };
+  static const auditFilterAll = {'en': 'All', 'pl': 'Wszystko'};
+  static const auditFilterActions = {'en': 'Actions', 'pl': 'Akcje'};
+  static const auditFilterTokens = {'en': 'Tokens', 'pl': 'Tokeny'};
+  static const auditFilterPairing = {'en': 'Pairing', 'pl': 'Pairing'};
+
+  // Friendly labels — fall back to the raw event name when missing.
+  // Keep these short; details still render in the subtitle.
+  static const evtActionRestartService = {
+    'en': 'Restarted {service}',
+    'pl': 'Zrestartowano {service}',
+  };
+  static const evtActionRestartDenied = {
+    'en': 'Restart denied: {service}',
+    'pl': 'Restart odmówiony: {service}',
+  };
+  static const evtActionReboot = {
+    'en': 'Server reboot scheduled',
+    'pl': 'Zaplanowano restart serwera',
+  };
+  static const evtActionRebootDenied = {
+    'en': 'Reboot denied',
+    'pl': 'Restart odmówiony',
+  };
+  static const evtActionApplySecurity = {
+    'en': 'Applied security updates',
+    'pl': 'Zaaplikowano aktualizacje bezpieczeństwa',
+  };
+  static const evtActionTailLogs = {
+    'en': 'Viewed logs: {service}',
+    'pl': 'Wyświetlono logi: {service}',
+  };
+  static const evtActionLogsDenied = {
+    'en': 'Logs denied: {service}',
+    'pl': 'Logi odmówione: {service}',
+  };
+  static const evtTokenIssued = {
+    'en': 'Token issued ({device})',
+    'pl': 'Wystawiono token ({device})',
+  };
+  static const evtTokenRevoked = {
+    'en': 'Token revoked',
+    'pl': 'Odwołano token',
+  };
+  static const evtTokenAuthFailed = {
+    'en': 'Auth attempt failed',
+    'pl': 'Nieudana próba autoryzacji',
+  };
+  static const evtTokenForbidden = {
+    'en': 'Permission denied',
+    'pl': 'Brak uprawnień',
+  };
+  static const evtTokenPrefsUpdated = {
+    'en': 'Notification settings updated',
+    'pl': 'Zaktualizowano ustawienia powiadomień',
+  };
+  static const evtPairGenerated = {
+    'en': 'Pairing code generated',
+    'pl': 'Wygenerowano kod pairingu',
+  };
+  static const evtPairRedeemed = {
+    'en': 'Device paired',
+    'pl': 'Urządzenie sparowane',
+  };
+  static const evtPairFailed = {
+    'en': 'Pairing failed: {reason}',
+    'pl': 'Pairing nieudany: {reason}',
+  };
+  static const evtPairLockedOut = {
+    'en': 'Pairing code locked out',
+    'pl': 'Kod pairingu zablokowany',
+  };
+
   // ----- Backup / restore (Phase 3P) -----
   static const sectionData = {'en': 'Data', 'pl': 'Dane'};
   static const dataTitle = {

@@ -10,6 +10,7 @@ import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
 import 'add_server_screen.dart';
+import 'audit_screen.dart';
 import 'backup_screen.dart';
 import 'notification_settings_screen.dart';
 
@@ -45,6 +46,12 @@ class SettingsScreen extends ConsumerWidget {
                 MaterialPageRoute(
                   builder: (_) =>
                       NotificationSettingsScreen(serverId: s.id),
+                ),
+              ),
+              onOpenAudit: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AuditScreen(serverId: s.id),
                 ),
               ),
             ),
@@ -154,6 +161,7 @@ class _ServerTile extends StatelessWidget {
   final ValueChanged<String> onRename;
   final VoidCallback onRemove;
   final VoidCallback onOpenNotifications;
+  final VoidCallback onOpenAudit;
 
   const _ServerTile({
     required this.server,
@@ -162,6 +170,7 @@ class _ServerTile extends StatelessWidget {
     required this.onRename,
     required this.onRemove,
     required this.onOpenNotifications,
+    required this.onOpenAudit,
   });
 
   @override
@@ -182,6 +191,8 @@ class _ServerTile extends StatelessWidget {
         onSelected: (value) async {
           if (value == 'notifications') {
             onOpenNotifications();
+          } else if (value == 'audit') {
+            onOpenAudit();
           } else if (value == 'rename') {
             final newName = await _promptRename(context, server.name);
             if (newName != null && newName.trim().isNotEmpty) {
@@ -215,6 +226,10 @@ class _ServerTile extends StatelessWidget {
           PopupMenuItem<String>(
             value: 'notifications',
             child: Text(tr(ctx, S.notificationsMenu)),
+          ),
+          PopupMenuItem<String>(
+            value: 'audit',
+            child: Text(tr(ctx, S.auditMenu)),
           ),
           PopupMenuItem<String>(
             value: 'rename',

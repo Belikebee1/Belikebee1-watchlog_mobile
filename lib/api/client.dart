@@ -209,6 +209,19 @@ class WatchlogApi {
     return resp.data!;
   }
 
+  /// Fetch recent audit-log entries from the server.
+  /// [kind] is an optional event-name prefix (e.g. "ACTION_").
+  Future<List<dynamic>> fetchAudit({int limit = 200, String? kind}) async {
+    final query = <String, dynamic>{'limit': limit};
+    if (kind != null && kind.isNotEmpty) query['kind'] = kind;
+    final resp = await _dio.get<Map<String, dynamic>>(
+      '/api/v1/audit',
+      queryParameters: query,
+    );
+    _ensureOk(resp);
+    return (resp.data?['entries'] as List?) ?? [];
+  }
+
   /// List the last ~90 days of archived runs as one-line summaries.
   /// Each entry includes the worst severity seen that day so the
   /// mobile history browser can color-code the calendar without
