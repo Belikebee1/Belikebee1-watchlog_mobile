@@ -350,7 +350,7 @@ class _ActionRow extends StatelessWidget {
                     onSnooze!();
                   },
             icon: const Icon(Icons.snooze_outlined, size: 18),
-            label: Text(tr_strings.tr(context, tr_strings.S.snooze4h)),
+            label: Text('${tr_strings.tr(context, tr_strings.S.snoozeShort)}…'),
           ),
         ),
         const SizedBox(width: 8),

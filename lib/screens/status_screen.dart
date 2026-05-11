@@ -19,6 +19,7 @@ import '../widgets/server_header.dart';
 import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/snooze_duration_sheet.dart';
 import 'history_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
@@ -123,12 +124,27 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
   Future<void> _onSnooze(String check) async {
     final api = ref.read(serverApiProvider(widget.serverId));
     if (api == null) return;
+    // Let the user pick a duration up-front instead of hard-coding 4h.
+    // Cancelling the sheet bails out of the entire snooze flow.
+    final hours = await SnoozeDurationSheet.show(context, checkName: check);
+    if (hours == null) return;
+    if (!mounted) return;
     try {
-      await api.snooze(check, 4);
+      await api.snooze(check, hours);
       if (!mounted) return;
+      // Use a human-friendly snackbar message: short durations get
+      // hours, multi-day durations switch to days for readability.
+      final msg = hours >= 24 && hours % 24 == 0
+          ? tr(context, S.snoozeSnackDays, subs: {
+              'check': check,
+              'n': '${hours ~/ 24}',
+            })
+          : tr(context, S.snoozeSnackHours, subs: {
+              'check': check,
+              'n': '$hours',
+            });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(tr(context, S.snackSnoozed, subs: {'check': check}))),
+        SnackBar(content: Text(msg)),
       );
       _refresh();
     } catch (e) {

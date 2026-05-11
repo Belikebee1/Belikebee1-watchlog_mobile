@@ -147,6 +147,40 @@ class S {
 
   // ----- Check actions / explainer -----
   static const snooze4h = {'en': 'Snooze 4h', 'pl': 'Wycisz na 4h'};
+  static const snoozeShort = {'en': 'Snooze', 'pl': 'Wycisz'};
+  static const snoozePickerTitle = {
+    'en': 'Snooze {check}',
+    'pl': 'Wycisz {check}',
+  };
+  static const snoozePickerHint = {
+    'en':
+        'Pick how long to silence this check across email, Telegram, and push.',
+    'pl':
+        'Wybierz na jak długo wyciszyć ten check — działa dla email, Telegramu i pusha.',
+  };
+  static const snooze1h = {'en': '1 hour', 'pl': '1 godzina'};
+  static const snooze4hLabel = {'en': '4 hours', 'pl': '4 godziny'};
+  static const snooze12h = {'en': '12 hours', 'pl': '12 godzin'};
+  static const snooze24h = {'en': '1 day', 'pl': '1 dzień'};
+  static const snooze72h = {'en': '3 days', 'pl': '3 dni'};
+  static const snooze168h = {'en': '1 week', 'pl': '1 tydzień'};
+  static const snoozeCustom = {'en': 'Custom…', 'pl': 'Inny…'};
+  static const snoozeCustomTitle = {
+    'en': 'Custom snooze duration',
+    'pl': 'Niestandardowy czas wyciszenia',
+  };
+  static const snoozeCustomLabel = {
+    'en': 'Hours (1 to 720)',
+    'pl': 'Godziny (1 do 720)',
+  };
+  static const snoozeSnackHours = {
+    'en': 'Snoozed {check} for {n}h',
+    'pl': 'Wyciszono {check} na {n}h',
+  };
+  static const snoozeSnackDays = {
+    'en': 'Snoozed {check} for {n} days',
+    'pl': 'Wyciszono {check} na {n} dni',
+  };
   static const ignore = {'en': 'Ignore', 'pl': 'Ignoruj'};
   static const clear = {'en': 'Clear', 'pl': 'Wyczyść'};
   static const reEnable = {'en': 'Re-enable', 'pl': 'Włącz ponownie'};

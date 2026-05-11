@@ -90,7 +90,7 @@ class CheckRow extends StatelessWidget {
                   Wrap(
                     spacing: 4,
                     children: [
-                      _smallBtn(context, tr(context, S.snooze4h), onSnooze),
+                      _smallBtn(context, '${tr(context, S.snoozeShort)}…', onSnooze),
                       _smallBtn(context, tr(context, S.ignore), onIgnore),
                       _smallBtn(context, tr(context, S.clear), onClear),
                     ],
