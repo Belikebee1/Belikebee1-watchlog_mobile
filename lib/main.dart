@@ -12,9 +12,11 @@ import 'providers/auth_provider.dart';
 import 'providers/crash_reporting_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/lock_provider.dart';
+import 'providers/onboarding_provider.dart';
 import 'providers/push_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/add_server_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/overview_screen.dart';
 import 'theme.dart';
 import 'widgets/app_lock_gate.dart';
@@ -85,6 +87,7 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
     await ref.read(themeModeProvider.notifier).load();
     await ref.read(localeProvider.notifier).load();
     await ref.read(lockProvider.notifier).load();
+    await ref.read(onboardingProvider.notifier).load();
     // Honor the persisted crash-reporting opt-in before any work
     // we'd want to report on can produce errors.
     await ref.read(crashReportingProvider.notifier).load();
@@ -102,6 +105,7 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
     final auth = ref.watch(authProvider);
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final onboardingDone = ref.watch(onboardingProvider) ?? false;
     return MaterialApp(
       title: 'watchlog',
       debugShowCheckedModeBanner: false,
@@ -117,11 +121,17 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
       ],
       home: !_bootstrapped
           ? const _Splash()
-          : AppLockGate(
-              child: auth.isAuthenticated
-                  ? const OverviewScreen()
-                  : const AddServerScreen(isFirstRun: true),
-            ),
+          : !onboardingDone && !auth.isAuthenticated
+              // First launch with no paired server: take the user
+              // through onboarding before dropping them on the pair
+              // screen. Returning users keep going straight to the
+              // dashboard.
+              ? const OnboardingScreen()
+              : AppLockGate(
+                  child: auth.isAuthenticated
+                      ? const OverviewScreen()
+                      : const AddServerScreen(isFirstRun: true),
+                ),
     );
   }
 }

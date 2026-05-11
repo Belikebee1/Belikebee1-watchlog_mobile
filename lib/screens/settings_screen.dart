@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../providers/crash_reporting_provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/lock_provider.dart';
+import '../providers/onboarding_provider.dart';
 import '../providers/push_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme.dart';
@@ -123,6 +124,21 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(tr(context, S.sectionLanguage)),
           const _LanguageTile(),
           const Divider(),
+          ListTile(
+            leading: Icon(Icons.school_outlined,
+                color: context.surfaces.fgMuted),
+            title: Text(tr(context, S.onboardingReplay)),
+            onTap: () async {
+              await ref.read(onboardingProvider.notifier).reset();
+              // Pop all the way back to the home route. MaterialApp's
+              // home swaps to OnboardingScreen as soon as the provider
+              // state flips — popUntil makes sure we actually land on it
+              // instead of staying on whatever was below Settings.
+              if (context.mounted) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+            },
+          ),
           ListTile(
             leading: Icon(Icons.info_outline, color: context.surfaces.fgMuted),
             title: Text(tr(context, S.sectionAbout)),

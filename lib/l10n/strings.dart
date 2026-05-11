@@ -555,6 +555,58 @@ class S {
     'pl': 'Kod pairingu zablokowany',
   };
 
+  // ----- Onboarding (Phase 4I) -----
+  static const onboardingReplay = {
+    'en': 'Show onboarding again',
+    'pl': 'Pokaż wprowadzenie ponownie',
+  };
+  static const onboardingNext = {'en': 'Next', 'pl': 'Dalej'};
+  static const onboardingSkip = {'en': 'Skip', 'pl': 'Pomiń'};
+  static const onboardingGetStarted = {
+    'en': 'Get started',
+    'pl': 'Zaczynamy',
+  };
+  static const ob1Title = {
+    'en': 'Welcome to watchlog',
+    'pl': 'Witaj w watchlog',
+  };
+  static const ob1Body = {
+    'en':
+        'Daily health & security checks for your Linux servers, with mobile alerts when something needs attention.',
+    'pl':
+        'Codzienne sprawdzenia zdrowia i bezpieczeństwa Twoich serwerów Linux, z powiadomieniami mobilnymi gdy coś wymaga uwagi.',
+  };
+  static const ob2Title = {
+    'en': 'Pair in seconds',
+    'pl': 'Sparuj w sekundach',
+  };
+  static const ob2Body = {
+    'en':
+        'Run sudo watchlog api qr on the server, point your phone at the terminal, done. No copy-paste of bearer tokens. Each device gets its own revocable token.',
+    'pl':
+        'Uruchom sudo watchlog api qr na serwerze, skieruj telefon na terminal, gotowe. Bez kopiowania bearer tokenów. Każde urządzenie dostaje własny, odwoływalny token.',
+  };
+  static const ob3Title = {
+    'en': 'Smart notifications',
+    'pl': 'Inteligentne powiadomienia',
+  };
+  static const ob3Body = {
+    'en':
+        'Push when something fires, silenced during your quiet hours, grouped so the same warning never spams you. Apply security updates straight from the alert.',
+    'pl':
+        'Push gdy coś się stanie, wyciszony w cichych godzinach, grupowany żeby to samo ostrzeżenie nie spamowało. Aplikuj security updates prosto z alertu.',
+  };
+  static const ob4Title = {
+    'en': 'Your data, your phone',
+    'pl': 'Twoje dane, Twój telefon',
+  };
+  static const ob4Body = {
+    'en':
+        'Tokens live in the OS keystore. Optional biometric lock. Encrypted backup to move between phones. Crash reports are opt-in — nothing leaves the device until you flip the switch.',
+    'pl':
+        'Tokeny mieszkają w systemowym keystore. Opcjonalny zamek biometryczny. Zaszyfrowana kopia zapasowa do przenoszenia między telefonami. Raporty błędów są opt-in — nic nie opuszcza urządzenia dopóki nie włączysz.',
+  };
+
   // ----- Crash reporting (Phase 3S) -----
   static const crashReportingTitle = {
     'en': 'Send crash reports',
