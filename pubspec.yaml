@@ -30,9 +30,10 @@ dependencies:
   # dependency from the SDK)
   intl: ^0.20.2
 
-  # Firebase / push notifications
+  # Firebase / push notifications + crash reporting
   firebase_core: ^3.8.0
   firebase_messaging: ^15.1.5
+  firebase_crashlytics: ^4.2.0
   flutter_local_notifications: ^18.0.1
 
   # QR code scanner for pairing flow

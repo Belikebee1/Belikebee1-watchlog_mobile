@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/strings.dart';
 import '../models/server.dart';
 import '../providers/auth_provider.dart';
+import '../providers/crash_reporting_provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/lock_provider.dart';
 import '../providers/push_provider.dart';
@@ -114,6 +115,7 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
           _SectionHeader(tr(context, S.sectionSecurity)),
           const _SecurityTile(),
+          const _CrashReportingTile(),
           const Divider(),
           _SectionHeader(tr(context, S.sectionAppearance)),
           const _AppearanceTile(),
@@ -455,6 +457,30 @@ class _SecurityTile extends ConsumerWidget {
               : null,
         ),
       ],
+    );
+  }
+}
+
+
+/// Opt-in toggle for Firebase Crashlytics. Default OFF — we only
+/// send crash data when the user has explicitly turned it on. The
+/// underlying provider flushes any queued reports the moment this
+/// flips back to false.
+class _CrashReportingTile extends ConsumerWidget {
+  const _CrashReportingTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(crashReportingProvider) ?? false;
+    return SwitchListTile(
+      title: Text(tr(context, S.crashReportingTitle)),
+      subtitle: Text(
+        tr(context, S.crashReportingHint),
+        style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+      ),
+      value: enabled,
+      onChanged: (v) =>
+          ref.read(crashReportingProvider.notifier).setEnabled(v),
     );
   }
 }

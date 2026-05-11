@@ -22,6 +22,10 @@ plugins {
     id("com.android.application") version "8.9.1" apply false
     id("org.jetbrains.kotlin.android") version "2.1.0" apply false
     id("com.google.gms.google-services") version "4.4.4" apply false
+    // Crashlytics Gradle plugin uploads dSYMs / mapping files at build
+    // time so the dashboard symbolicates stack traces correctly. The
+    // plugin itself is applied per-module (see app/build.gradle.kts).
+    id("com.google.firebase.crashlytics") version "3.0.2" apply false
 }
 
 include(":app")

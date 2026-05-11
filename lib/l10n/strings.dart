@@ -555,6 +555,18 @@ class S {
     'pl': 'Kod pairingu zablokowany',
   };
 
+  // ----- Crash reporting (Phase 3S) -----
+  static const crashReportingTitle = {
+    'en': 'Send crash reports',
+    'pl': 'Wysyłaj raporty błędów',
+  };
+  static const crashReportingHint = {
+    'en':
+        'Anonymous crash logs + stack traces help fix bugs faster. Nothing else is collected. Off by default.',
+    'pl':
+        'Anonimowe raporty awarii + stack trace pomagają szybciej naprawiać bugi. Nic innego nie jest zbierane. Domyślnie wyłączone.',
+  };
+
   // ----- Backup / restore (Phase 3P) -----
   static const sectionData = {'en': 'Data', 'pl': 'Dane'};
   static const dataTitle = {
