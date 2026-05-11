@@ -10,11 +10,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/crash_reporting_provider.dart';
+import 'providers/analytics_provider.dart';
 import 'providers/changelog_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/lock_provider.dart';
 import 'providers/onboarding_provider.dart';
 import 'providers/push_provider.dart';
+import 'providers/rate_prompt_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/add_server_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -91,6 +93,8 @@ class _WatchlogAppState extends ConsumerState<WatchlogApp> {
     await ref.read(lockProvider.notifier).load();
     await ref.read(onboardingProvider.notifier).load();
     await ref.read(changelogProvider.notifier).load();
+    await ref.read(analyticsProvider.notifier).load();
+    await ref.read(ratePromptProvider.notifier).load();
     // Honor the persisted crash-reporting opt-in before any work
     // we'd want to report on can produce errors.
     await ref.read(crashReportingProvider.notifier).load();

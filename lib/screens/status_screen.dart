@@ -8,6 +8,7 @@ import '../api/models.dart';
 import '../l10n/strings.dart';
 import '../providers/auth_provider.dart';
 import '../providers/host_info_provider.dart';
+import '../providers/rate_prompt_provider.dart';
 import '../providers/status_provider.dart';
 import '../theme.dart';
 import '../utils/error_humanizer.dart';
@@ -77,6 +78,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         ),
       );
       _refresh();
+      await ref.read(ratePromptProvider.notifier).maybePrompt();
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(shortMessage(context, e))));
     }
@@ -106,6 +108,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     // Subtle confirmation that the action fired — apply-security
     // takes long enough that some haptic ack feels reassuring.
     HapticFeedback.mediumImpact();
+    // Note user engagement for the in-app review heuristic.
+    await ref.read(ratePromptProvider.notifier).recordAction();
 
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(

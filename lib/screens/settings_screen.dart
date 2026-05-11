@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/strings.dart';
 import '../models/server.dart';
+import '../providers/analytics_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/crash_reporting_provider.dart';
 import '../providers/locale_provider.dart';
@@ -14,6 +15,7 @@ import '../theme.dart';
 import 'add_server_screen.dart';
 import 'audit_screen.dart';
 import 'backup_screen.dart';
+import 'help_screen.dart';
 import 'notification_settings_screen.dart';
 import 'release_notes_screen.dart';
 
@@ -118,6 +120,7 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(tr(context, S.sectionSecurity)),
           const _SecurityTile(),
           const _CrashReportingTile(),
+          const _AnalyticsTile(),
           const Divider(),
           _SectionHeader(tr(context, S.sectionAppearance)),
           const _AppearanceTile(),
@@ -125,6 +128,17 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(tr(context, S.sectionLanguage)),
           const _LanguageTile(),
           const Divider(),
+          ListTile(
+            leading: Icon(Icons.help_outline,
+                color: context.surfaces.fgMuted),
+            title: Text(tr(context, S.helpMenu)),
+            trailing: Icon(Icons.chevron_right,
+                color: context.surfaces.fgMuted),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HelpScreen()),
+            ),
+          ),
           ListTile(
             leading: Icon(Icons.new_releases_outlined,
                 color: context.surfaces.fgMuted),
@@ -509,6 +523,29 @@ class _CrashReportingTile extends ConsumerWidget {
       value: enabled,
       onChanged: (v) =>
           ref.read(crashReportingProvider.notifier).setEnabled(v),
+    );
+  }
+}
+
+
+/// Opt-in toggle for Firebase Analytics. Same UX shape as the
+/// crash-reporting tile — off by default, anonymous when on. The
+/// underlying provider syncs to Firebase consent flags.
+class _AnalyticsTile extends ConsumerWidget {
+  const _AnalyticsTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(analyticsProvider) ?? false;
+    return SwitchListTile(
+      title: Text(tr(context, S.analyticsTitle)),
+      subtitle: Text(
+        tr(context, S.analyticsHint),
+        style: TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+      ),
+      value: enabled,
+      onChanged: (v) =>
+          ref.read(analyticsProvider.notifier).setEnabled(v),
     );
   }
 }

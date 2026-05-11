@@ -571,6 +571,55 @@ class S {
   static const whatsNewClose = {'en': 'Got it', 'pl': 'Rozumiem'};
   static const versionLabel = {'en': 'Version {n}', 'pl': 'Wersja {n}'};
 
+  // ----- Help / support (Phase 5U) -----
+  static const sectionHelp = {'en': 'Help', 'pl': 'Pomoc'};
+  static const helpTitle = {'en': 'Help & support', 'pl': 'Pomoc i wsparcie'};
+  static const helpMenu = {'en': 'Help & support', 'pl': 'Pomoc i wsparcie'};
+  static const helpDocs = {
+    'en': 'Documentation',
+    'pl': 'Dokumentacja',
+  };
+  static const helpDocsHint = {
+    'en': 'Setup guides, check explainers, and the API reference on watchlog.pl.',
+    'pl': 'Przewodniki konfiguracji, wyjaśnienia checków i referencja API na watchlog.pl.',
+  };
+  static const helpReportBug = {
+    'en': 'Report a bug',
+    'pl': 'Zgłoś błąd',
+  };
+  static const helpReportBugHint = {
+    'en': 'Opens GitHub issues for the watchlog repo.',
+    'pl': 'Otwiera GitHub issues dla repo watchlog.',
+  };
+  static const helpContactEmail = {
+    'en': 'Contact email',
+    'pl': 'Kontakt mailowy',
+  };
+  static const helpContactEmailHint = {
+    'en': 'andrzej@belikebee.com — reach the maintainer directly.',
+    'pl': 'andrzej@belikebee.com — bezpośredni kontakt z autorem.',
+  };
+  static const helpSource = {
+    'en': 'Source code',
+    'pl': 'Kod źródłowy',
+  };
+  static const helpSourceHint = {
+    'en': 'Backend on GitHub Belikebee1/watchlog (MIT licensed).',
+    'pl': 'Backend na GitHubie Belikebee1/watchlog (licencja MIT).',
+  };
+
+  // ----- Analytics (Phase 5T) -----
+  static const analyticsTitle = {
+    'en': 'Anonymous usage stats',
+    'pl': 'Anonimowe statystyki użycia',
+  };
+  static const analyticsHint = {
+    'en':
+        'Helps me see which features are actually used. No tokens, hostnames, or personal data ever leave the device. Off by default.',
+    'pl':
+        'Pomaga mi widzieć, które funkcje są używane. Tokeny, hostnames ani inne dane osobowe nie opuszczają urządzenia. Domyślnie wyłączone.',
+  };
+
   // ----- Onboarding (Phase 4I) -----
   static const onboardingReplay = {
     'en': 'Show onboarding again',
