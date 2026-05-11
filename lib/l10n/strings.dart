@@ -528,6 +528,26 @@ class S {
     'pl':
         'Globalny próg — alerty poniżej nigdy nie wysyłają, niezależnie od cichych godzin.',
   };
+  static const sectionGrouping = {
+    'en': 'Smart grouping',
+    'pl': 'Inteligentne grupowanie',
+  };
+  static const cooldownLabel = {
+    'en': 'Repeat cooldown',
+    'pl': 'Przerwa przed powtórzeniem',
+  };
+  static const cooldownHint = {
+    'en':
+        'A check at the same severity won\'t push twice within this window. Escalation (severity went up) always punches through. Set to 0 to push on every run.',
+    'pl':
+        'Check przy tej samej severity nie wyśle drugiego pusha w tym oknie. Eskalacja (wzrost severity) zawsze przebija. 0 = push przy każdym uruchomieniu.',
+  };
+  static const cooldownHours = {
+    'en': '{n} hours',
+    'pl': '{n} godzin',
+  };
+  static const cooldownOff = {'en': 'Off', 'pl': 'Wyłączone'};
+
   static const sectionPerCheck = {
     'en': 'Per-check muting',
     'pl': 'Wyciszanie per check',

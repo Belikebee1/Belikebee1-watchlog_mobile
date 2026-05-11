@@ -209,6 +209,36 @@ class _Body extends StatelessWidget {
           ),
         ),
         const Divider(),
+        _SectionHeader(tr(context, S.sectionGrouping)),
+        ListTile(
+          enabled: !busy,
+          title: Text(tr(context, S.cooldownLabel)),
+          trailing: DropdownButton<int>(
+            value: prefs.cooldownHours,
+            onChanged: busy
+                ? null
+                : (v) {
+                    if (v != null) onPatch({'cooldown_hours': v});
+                  },
+            items: [
+              DropdownMenuItem(value: 0, child: Text(tr(context, S.cooldownOff))),
+              for (final h in [1, 2, 4, 6, 12, 24, 48, 168])
+                DropdownMenuItem(
+                  value: h,
+                  child: Text(tr(context, S.cooldownHours, subs: {'n': '$h'})),
+                ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          child: Text(
+            tr(context, S.cooldownHint),
+            style:
+                TextStyle(color: context.surfaces.fgMuted, fontSize: 12),
+          ),
+        ),
+        const Divider(),
         _SectionHeader(tr(context, S.sectionPerCheck)),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),

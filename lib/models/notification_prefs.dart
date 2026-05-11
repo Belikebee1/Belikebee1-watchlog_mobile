@@ -18,6 +18,7 @@ class NotificationPreferences {
   final String quietMinSeverity;
   final String minSeverity;
   final List<String> disabledChecks;
+  final int cooldownHours;
 
   const NotificationPreferences({
     required this.quietHoursEnabled,
@@ -27,6 +28,7 @@ class NotificationPreferences {
     required this.quietMinSeverity,
     required this.minSeverity,
     required this.disabledChecks,
+    required this.cooldownHours,
   });
 
   static const defaults = NotificationPreferences(
@@ -37,6 +39,7 @@ class NotificationPreferences {
     quietMinSeverity: 'CRITICAL',
     minSeverity: 'WARN',
     disabledChecks: [],
+    cooldownHours: 12,
   );
 
   factory NotificationPreferences.fromJson(Map<String, dynamic> json) =>
@@ -52,6 +55,7 @@ class NotificationPreferences {
         disabledChecks: ((json['disabled_checks'] as List?) ?? const [])
             .map((e) => e.toString())
             .toList(),
+        cooldownHours: (json['cooldown_hours'] as int?) ?? 12,
       );
 
   Map<String, dynamic> toJson() => {
@@ -62,6 +66,7 @@ class NotificationPreferences {
         'quiet_min_severity': quietMinSeverity,
         'min_severity': minSeverity,
         'disabled_checks': disabledChecks,
+        'cooldown_hours': cooldownHours,
       };
 
   NotificationPreferences copyWith({
@@ -72,6 +77,7 @@ class NotificationPreferences {
     String? quietMinSeverity,
     String? minSeverity,
     List<String>? disabledChecks,
+    int? cooldownHours,
   }) =>
       NotificationPreferences(
         quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
@@ -81,5 +87,6 @@ class NotificationPreferences {
         quietMinSeverity: quietMinSeverity ?? this.quietMinSeverity,
         minSeverity: minSeverity ?? this.minSeverity,
         disabledChecks: disabledChecks ?? this.disabledChecks,
+        cooldownHours: cooldownHours ?? this.cooldownHours,
       );
 }
