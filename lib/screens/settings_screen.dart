@@ -15,6 +15,7 @@ import 'add_server_screen.dart';
 import 'audit_screen.dart';
 import 'backup_screen.dart';
 import 'notification_settings_screen.dart';
+import 'release_notes_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -124,6 +125,17 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(tr(context, S.sectionLanguage)),
           const _LanguageTile(),
           const Divider(),
+          ListTile(
+            leading: Icon(Icons.new_releases_outlined,
+                color: context.surfaces.fgMuted),
+            title: Text(tr(context, S.releaseNotesMenu)),
+            trailing: Icon(Icons.chevron_right,
+                color: context.surfaces.fgMuted),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ReleaseNotesScreen()),
+            ),
+          ),
           ListTile(
             leading: Icon(Icons.school_outlined,
                 color: context.surfaces.fgMuted),

@@ -55,6 +55,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.6
 
 flutter:
   uses-material-design: true
@@ -73,3 +74,20 @@ flutter_launcher_icons:
     generate: false
   adaptive_icon_background: "#0B1020"
   adaptive_icon_foreground: "assets/icon/icon.png"
+
+# Native splash configuration — run on Windows after pulling:
+#   dart run flutter_native_splash:create
+# That generates the platform-specific drawables / launchScreens so
+# the white-screen-before-Flutter-loads goes away. Branded with the
+# same slate-navy background as the app's dark theme.
+flutter_native_splash:
+  color: "#0F172A"
+  color_dark: "#0F172A"
+  image: "assets/icon/icon.png"
+  android_12:
+    color: "#0F172A"
+    color_dark: "#0F172A"
+    image: "assets/icon/icon.png"
+  android: true
+  ios: true
+  web: false

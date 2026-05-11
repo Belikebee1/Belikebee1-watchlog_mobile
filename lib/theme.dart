@@ -144,6 +144,16 @@ ThemeData _buildTheme({
     colorScheme: scheme,
     scaffoldBackgroundColor: surfaces.bg,
     extensions: [surfaces],
+    // Consistent Material 3 shared-axis transitions on every platform.
+    // (Default Cupertino slide on iOS would visually mismatch our
+    // dark-elevation surfaces.) Reduced-motion users automatically
+    // get linear no-op transitions via Flutter's MediaQuery handling.
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: ZoomPageTransitionsBuilder(),
+        TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+      },
+    ),
     appBarTheme: AppBarTheme(
       backgroundColor: surfaces.bg,
       foregroundColor: surfaces.fg,

@@ -113,7 +113,7 @@ class PushService {
       msg.messageId.hashCode,
       notif.title ?? 'watchlog',
       notif.body ?? '',
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'watchlog_alerts',
           'watchlog alerts',
@@ -121,8 +121,13 @@ class PushService {
           importance: Importance.high,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+          // Phase 4BB: a small numeric badge next to the app icon on
+          // launchers that support it (Samsung One UI, Pixel
+          // Launcher's notification dot count, etc.). FCM also sends
+          // an APNs badge for iOS via PushService config.
+          number: int.tryParse(msg.data['actionable_count'] ?? '') ?? 1,
         ),
-        iOS: DarwinNotificationDetails(
+        iOS: const DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,

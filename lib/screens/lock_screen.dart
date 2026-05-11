@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/strings.dart';
@@ -38,6 +39,11 @@ class _LockScreenState extends ConsumerState<LockScreen> {
         .read(lockProvider.notifier)
         .authenticate(tr(context, S.lockReason));
     if (!mounted) return;
+    if (ok) {
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.heavyImpact();
+    }
     setState(() {
       _attempting = false;
       _failed = !ok;

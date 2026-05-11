@@ -555,6 +555,22 @@ class S {
     'pl': 'Kod pairingu zablokowany',
   };
 
+  // ----- Changelog (Phase 4J) -----
+  static const releaseNotesTitle = {
+    'en': 'Release notes',
+    'pl': 'Notatki wydań',
+  };
+  static const releaseNotesMenu = {
+    'en': 'Release notes',
+    'pl': 'Notatki wydań',
+  };
+  static const whatsNewTitle = {
+    'en': "What's new in {version}",
+    'pl': 'Co nowego w {version}',
+  };
+  static const whatsNewClose = {'en': 'Got it', 'pl': 'Rozumiem'};
+  static const versionLabel = {'en': 'Version {n}', 'pl': 'Wersja {n}'};
+
   // ----- Onboarding (Phase 4I) -----
   static const onboardingReplay = {
     'en': 'Show onboarding again',

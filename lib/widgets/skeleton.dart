@@ -55,6 +55,26 @@ class _SkeletonState extends State<Skeleton>
 
   @override
   Widget build(BuildContext context) {
+    // Respect the user's "reduce motion" accessibility preference
+    // (MediaQuery.disableAnimations). When set, render a static mid-
+    // alpha block instead of pulsing — still recognizable as a
+    // skeleton, no vestibular distraction.
+    final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    if (reduced) {
+      return Container(
+        margin: widget.margin,
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: context.surfaces.fgMuted.withValues(alpha: 0.2),
+          shape: widget.shape,
+          borderRadius: widget.shape == BoxShape.circle
+              ? null
+              : BorderRadius.circular(widget.radius),
+        ),
+      );
+    }
+
     final groupController =
         SkeletonGroup.maybeControllerOf(context);
     final controller = groupController ??

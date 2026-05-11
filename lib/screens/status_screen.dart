@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/models.dart';
@@ -102,6 +103,10 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     );
     if (confirm != true) return;
 
+    // Subtle confirmation that the action fired — apply-security
+    // takes long enough that some haptic ack feels reassuring.
+    HapticFeedback.mediumImpact();
+
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(
         SnackBar(content: Text(tr(context, S.applyingSecurity))));
@@ -129,6 +134,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final hours = await SnoozeDurationSheet.show(context, checkName: check);
     if (hours == null) return;
     if (!mounted) return;
+    HapticFeedback.selectionClick();
     try {
       await api.snooze(check, hours);
       if (!mounted) return;
@@ -211,6 +217,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
+            tooltip: tr(context, S.settingsTitle),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
