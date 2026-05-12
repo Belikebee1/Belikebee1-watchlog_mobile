@@ -22,6 +22,7 @@ import '../widgets/severity_banner.dart';
 import '../widgets/severity_legend_sheet.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/snooze_duration_sheet.dart';
+import '../widgets/update_banner.dart';
 import 'history_screen.dart';
 import 'output_screen.dart';
 import 'settings_screen.dart';
@@ -278,6 +279,11 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
+          // Update banner shows iff the server is behind the latest
+          // GitHub release. Self-hides when unknown / up-to-date /
+          // dismissed-for-this-version, so giving it a permanent slot
+          // here is safe.
+          UpdateBanner(serverId: widget.serverId),
           ServerHeader(serverId: widget.serverId),
           const SizedBox(height: 12),
           if (status != null) ...[

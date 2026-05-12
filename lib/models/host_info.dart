@@ -18,6 +18,10 @@ class HostInfo {
   final DateTime? bootTime;
   final List<HostIp> ipAddresses;
   final String? timezone;
+  // Installed watchlog package version on the server. Null on older
+  // servers that pre-date /api/v1/host exposing this field — the
+  // update-available banner stays hidden in that case.
+  final String? watchlogVersion;
 
   const HostInfo({
     required this.hostname,
@@ -33,6 +37,7 @@ class HostInfo {
     this.bootTime,
     this.ipAddresses = const [],
     this.timezone,
+    this.watchlogVersion,
   });
 
   factory HostInfo.fromJson(Map<String, dynamic> json) => HostInfo(
@@ -53,6 +58,7 @@ class HostInfo {
             .map((e) => HostIp.fromJson(e as Map<String, dynamic>))
             .toList(),
         timezone: json['timezone'] as String?,
+        watchlogVersion: json['watchlog_version'] as String?,
       );
 
   static DateTime? _parseIso(Object? raw) {

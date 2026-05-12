@@ -78,6 +78,32 @@ class S {
   static const tabStatus = {'en': 'Status', 'pl': 'Status'};
   static const tabChecks = {'en': 'Checks', 'pl': 'Sprawdzenia'};
   static const tabActions = {'en': 'Actions', 'pl': 'Akcje'};
+
+  // ----- Update banner (Status tab) -----
+  static const updateBannerTitle = {
+    'en': 'Update available',
+    'pl': 'Dostępna aktualizacja',
+  };
+  static const updateBannerSubtitle = {
+    'en': 'Server is on {installed} — latest is {latest}',
+    'pl': 'Serwer ma {installed} — najnowsza to {latest}',
+  };
+  static const updateBannerCopy = {
+    'en': 'Copy command',
+    'pl': 'Skopiuj komendę',
+  };
+  static const updateBannerCopied = {
+    'en': 'Command copied. Paste it in your server SSH session.',
+    'pl': 'Skopiowano. Wklej w sesji SSH na serwerze.',
+  };
+  static const updateBannerReleaseNotes = {
+    'en': 'Release notes',
+    'pl': 'Co nowego',
+  };
+  static const updateBannerDismiss = {
+    'en': 'Dismiss',
+    'pl': 'Zamknij',
+  };
   static const applySecurityBtn = {
     'en': 'Apply security',
     'pl': 'Zaktualizuj bezpieczeństwo',
