@@ -202,36 +202,43 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final asyncCombined = ref.watch(serverStatusProvider(widget.serverId));
     final server = ref.watch(serverByIdProvider(widget.serverId));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          server?.name ?? 'watchlog',
-          overflow: TextOverflow.ellipsis,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: tr(context, S.historyTooltip),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => HistoryScreen(serverId: widget.serverId),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            server?.name ?? 'watchlog',
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: tr(context, S.historyTooltip),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => HistoryScreen(serverId: widget.serverId),
+                ),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: tr(context, S.settingsTitle),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: tr(context, S.settingsTitle),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
             ),
+          ],
+          bottom: TabBar(
+            tabs: [
+              Tab(text: tr(context, S.tabStatus)),
+              Tab(text: tr(context, S.tabChecks)),
+              Tab(text: tr(context, S.tabActions)),
+            ],
           ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async => _refresh(),
-        child: asyncCombined.when(
+        ),
+        body: asyncCombined.when(
           loading: () => const _StatusSkeleton(),
           error: (e, _) => ErrorView.from(
             e,
@@ -250,14 +257,43 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                     ? tr(context, S.openSettings)
                     : null,
           ),
-          data: (combined) =>
-              _buildContent(combined.status, combined.state),
+          data: (combined) => TabBarView(
+            children: [
+              _buildStatusTab(combined.status),
+              _buildChecksTab(combined.status, combined.state),
+              _buildActionsTab(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildContent(Status? status, StateData? state) {
+  // Tab 1: at-a-glance — server identity, severity banner, live metrics, counts.
+  // Everything the user wants to see in <2 seconds when they open the app.
+  Widget _buildStatusTab(Status? status) {
+    return RefreshIndicator(
+      onRefresh: () async => _refresh(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          ServerHeader(serverId: widget.serverId),
+          const SizedBox(height: 12),
+          if (status != null) ...[
+            LiveMetricsTile(status: status),
+            const SizedBox(height: 12),
+          ],
+          SeverityBanner(status: status, onRefresh: _refresh),
+          const SizedBox(height: 16),
+          if (status != null) _countsRow(status),
+        ],
+      ),
+    );
+  }
+
+  // Tab 2: the full check list with snooze/ignore — drilling into "what's wrong".
+  Widget _buildChecksTab(Status? status, StateData? state) {
     final actionable = status?.actionable ?? [];
     final snoozes = state?.snoozes ?? {};
     final ignores = state?.ignores ?? {};
@@ -296,92 +332,99 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       ));
     }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        ServerHeader(serverId: widget.serverId),
-        const SizedBox(height: 12),
-        if (status != null) ...[
-          LiveMetricsTile(status: status),
-          const SizedBox(height: 12),
-        ],
-        SeverityBanner(status: status, onRefresh: _refresh),
-        const SizedBox(height: 12),
-        ActionsPanel(serverId: widget.serverId),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: _applySecurity,
-                icon: const Icon(Icons.check_circle_outline),
-                label: Text(tr(context, S.applySecurityBtn)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.green,
+    return RefreshIndicator(
+      onRefresh: () async => _refresh(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (rows.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    const Text('✅', style: TextStyle(fontSize: 48)),
+                    const SizedBox(height: 8),
+                    Text(tr(context, S.allChecksPassing),
+                        style: TextStyle(color: context.surfaces.fg)),
+                    const SizedBox(height: 4),
+                    Text(tr(context, S.nothingToActOn),
+                        style: TextStyle(color: context.surfaces.fgMuted)),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _runWatchlog,
-                icon: const Icon(Icons.refresh),
-                label: Text(tr(context, S.runNowBtn)),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: context.surfaces.border),
-                  foregroundColor: context.surfaces.fg,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        if (status != null) _countsRow(status),
-        const SizedBox(height: 8),
-        if (rows.isEmpty)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
+            )
+          else
+            Card(
               child: Column(
                 children: [
-                  const Text('✅', style: TextStyle(fontSize: 48)),
-                  const SizedBox(height: 8),
-                  Text(tr(context, S.allChecksPassing),
-                      style: TextStyle(color: context.surfaces.fg)),
-                  const SizedBox(height: 4),
-                  Text(tr(context, S.nothingToActOn),
-                      style: TextStyle(color: context.surfaces.fgMuted)),
-                ],
-              ),
-            ),
-          )
-        else
-          Card(
-            child: Column(
-              children: [
-                for (var i = 0; i < rows.length; i++) ...[
-                  if (i > 0)
-                    Divider(height: 1, color: context.surfaces.border),
-                  CheckRow(
-                    data: rows[i],
-                    onSnooze: () => _onSnooze(rows[i].check),
-                    onIgnore: () => _onIgnore(rows[i].check),
-                    onClear: () => _onClear(rows[i].check),
-                    onTap: () => CheckExplainerSheet.show(
-                      context,
-                      serverId: widget.serverId,
+                  for (var i = 0; i < rows.length; i++) ...[
+                    if (i > 0)
+                      Divider(height: 1, color: context.surfaces.border),
+                    CheckRow(
                       data: rows[i],
                       onSnooze: () => _onSnooze(rows[i].check),
                       onIgnore: () => _onIgnore(rows[i].check),
                       onClear: () => _onClear(rows[i].check),
+                      onTap: () => CheckExplainerSheet.show(
+                        context,
+                        serverId: widget.serverId,
+                        data: rows[i],
+                        onSnooze: () => _onSnooze(rows[i].check),
+                        onIgnore: () => _onIgnore(rows[i].check),
+                        onClear: () => _onClear(rows[i].check),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
+        ],
+      ),
+    );
+  }
+
+  // Tab 3: the destructive / action-y stuff — Apply security, Run now,
+  // and the platform-aware action shortcuts (restart, reboot, tail logs).
+  Widget _buildActionsTab() {
+    return RefreshIndicator(
+      onRefresh: () async => _refresh(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _applySecurity,
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: Text(tr(context, S.applySecurityBtn)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.green,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _runWatchlog,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(tr(context, S.runNowBtn)),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: context.surfaces.border),
+                    foregroundColor: context.surfaces.fg,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
-      ],
+          const SizedBox(height: 16),
+          ActionsPanel(serverId: widget.serverId),
+        ],
+      ),
     );
   }
 
@@ -431,10 +474,10 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       );
 }
 
-/// Loading-state stand-in for the status screen. Mirrors the layout of
-/// the real content (server header strip → severity banner → action
-/// buttons → counts strip → check rows) so the page doesn't reflow when
-/// data arrives.
+/// Loading-state stand-in for the first tab (Status). Mirrors header +
+/// live metrics + banner + counts strip so the Status tab doesn't reflow
+/// when data arrives. The other two tabs' content is hidden until data
+/// loads, so they don't need a skeleton.
 class _StatusSkeleton extends StatelessWidget {
   const _StatusSkeleton();
 
@@ -442,6 +485,7 @@ class _StatusSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SkeletonGroup(
       child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
           // Server header strip skeleton
@@ -462,6 +506,28 @@ class _StatusSkeleton extends StatelessWidget {
                 const Skeleton(width: 80, height: 12),
                 const SizedBox(width: 12),
                 const Skeleton(width: 60, height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Live metrics placeholder — two stacked bars (disk + RAM).
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: context.surfaces.bgElevated,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: context.surfaces.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Skeleton(width: 120, height: 14),
+                SizedBox(height: 10),
+                Skeleton(width: double.infinity, height: 8, radius: 4),
+                SizedBox(height: 14),
+                Skeleton(width: 120, height: 14),
+                SizedBox(height: 10),
+                Skeleton(width: double.infinity, height: 8, radius: 4),
               ],
             ),
           ),
@@ -487,14 +553,6 @@ class _StatusSkeleton extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: const [
-              Expanded(child: Skeleton(height: 44, radius: 8)),
-              SizedBox(width: 8),
-              Expanded(child: Skeleton(height: 44, radius: 8)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: const [
               Expanded(child: Skeleton(height: 50, radius: 8)),
               SizedBox(width: 8),
               Expanded(child: Skeleton(height: 50, radius: 8)),
@@ -504,36 +562,6 @@ class _StatusSkeleton extends StatelessWidget {
               Expanded(child: Skeleton(height: 50, radius: 8)),
             ],
           ),
-          const SizedBox(height: 16),
-          // A few check-row placeholders
-          for (var i = 0; i < 4; i++) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: context.surfaces.bgElevated,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: context.surfaces.border),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Skeleton.circle(size: 18),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Skeleton(width: 100, height: 14),
-                        SizedBox(height: 6),
-                        Skeleton(width: double.infinity, height: 12),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );

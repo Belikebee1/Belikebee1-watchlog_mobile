@@ -75,6 +75,9 @@ class S {
   static const ageDaysAgo = {'en': '{n}d ago', 'pl': '{n}d temu'};
 
   // ----- Status screen -----
+  static const tabStatus = {'en': 'Status', 'pl': 'Status'};
+  static const tabChecks = {'en': 'Checks', 'pl': 'Sprawdzenia'};
+  static const tabActions = {'en': 'Actions', 'pl': 'Akcje'};
   static const applySecurityBtn = {
     'en': 'Apply security',
     'pl': 'Zaktualizuj bezpieczeństwo',
